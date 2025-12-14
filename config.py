@@ -22,6 +22,7 @@ class BaseConfigSettings(BaseSettings):
     )
 
 FMOC_DocType = Literal["minutes", "statement", "presconf", "sep", "implementation"]
+
 class FOMCSettings(BaseConfigSettings): 
     base_url: str = "https://www.federalreserve.gov/monetarypolicy"
     start_year: int = 2020
@@ -45,3 +46,5 @@ class FOMCSettings(BaseConfigSettings):
     )
 
 settings = FOMCSettings()
+if __name__ == "__main__":
+    print(settings.base_url)

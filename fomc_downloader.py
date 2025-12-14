@@ -1,3 +1,6 @@
+'''
+takes around 2 hours to run to download all FOMC documents from 2020 to 2025
+'''
 import logging
 import requests
 from datetime import datetime
@@ -6,6 +9,7 @@ import os
 from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent
 from config import settings, FOMCSettings
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class FOMCDownloader:
@@ -61,7 +65,7 @@ if __name__ == "__main__":
     downloader = FOMCDownloader(config=settings)
     
     dates = downloader.get_date_range()
-    
+    start = datetime.now()
     logging.info(f"Scanning from {settings.start_year} to {settings.end_year}...")
 
     for date in dates:
@@ -69,3 +73,6 @@ if __name__ == "__main__":
             url = downloader.build_document_url(date, doc_type)
             filename = url.split('/')[-1]
             downloader.download_document(url, filename)
+    end = datetime.now()
+    duration = (end - start).total_seconds()
+    logging.info(f"Completed in {duration:.3f}s")
