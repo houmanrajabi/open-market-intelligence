@@ -7,15 +7,16 @@ from datetime import datetime
 from typing import List
 import os
 from pathlib import Path
-PROJECT_ROOT = Path(__file__).parent.parent
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 print ('project root of fomc_downloader file ', PROJECT_ROOT)
-from config import settings, FOMCSettings
+from src.utils.config import config
+
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class FOMCDownloader:
-    def __init__(self, config: FOMCSettings):
+    def __init__(self, config: config):
         self.cfg = config
         # Ensure output directory exists
         self.cfg.output_dir.mkdir(parents=True, exist_ok=True)
@@ -67,14 +68,14 @@ class FOMCDownloader:
             logging.error(f"Error fetching {url}: {e}")
 
 if __name__ == "__main__":
-    downloader = FOMCDownloader(config=settings)
+    downloader = FOMCDownloader(config=config.fomc_downloader)
     
     dates = downloader.get_date_range()
     start = datetime.now()
-    logging.info(f"Scanning from {settings.start_year} to {settings.end_year}...")
+    logging.info(f"Scanning from {config.fomc_downloader.start_year} to {config.fomc_downloader.end_year}...")
 
     for date in dates:
-        for doc_type in settings.target_docs:
+        for doc_type in config.fomc_downloader.target_docs:
             url = downloader.build_document_url(date, doc_type)
             filename = url.split('/')[-1]
             downloader.download_document(url, filename)
