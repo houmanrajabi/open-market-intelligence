@@ -32,10 +32,13 @@ class FOMCDownloader:
     
     def build_document_url(self, date: datetime, doc_type: str) -> str:
         date_str = date.strftime("%Y%m%d")
+        if doc_type == "presconf":
+            # Press conferences are in mediacenter, not monetarypolicy
+            return f"https://www.federalreserve.gov/mediacenter/files/FOMCpresconf{date_str}.pdf"
+        
         doc_patterns = {
             "statement": f"FOMC{date_str}statement.pdf",
             "minutes": f"fomcminutes{date_str}.pdf",
-            "presconf": f"FOMCpresconf{date_str}.pdf",
             "sep": f"fomcprojtabl{date_str}.pdf",
             "implementation": f"monetary{date_str}a1.pdf"
         }
@@ -57,7 +60,7 @@ class FOMCDownloader:
                     f.write(response.content)
                 logging.info(f"Downloaded: {save_path}")
             else:
-                pass 
+                logging.debug(f"Not found (404): {url}") 
         except requests.RequestException as e:
             logging.error(f"Error fetching {url}: {e}")
 

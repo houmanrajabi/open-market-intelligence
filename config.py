@@ -48,3 +48,4 @@ class FOMCSettings(BaseConfigSettings):
 settings = FOMCSettings()
 if __name__ == "__main__":
     print(settings.base_url)
+    print(settings.output_dir)
