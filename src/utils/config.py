@@ -50,6 +50,17 @@ class FOMCSettings(BaseConfigSettings):
         frozen=True
     )
 
+class NoteSettings(BaseConfigSettings): 
+    base_url: str = "https://www.federalreserve.gov/newsevents/pressreleases"
+    output_dir: Path = Path("data/raw/")
+    
+    model_config = SettingsConfigDict(
+        env_prefix="NOTE__", 
+        env_file=[".env", str(ENV_FILE_PATH)], 
+        extra="ignore",
+        frozen=True
+    )
+
 class LoggingConfig(BaseConfigSettings):
     level: str = "INFO" 
     log_file: Optional[Path] = Path("./logs/fomc_rag.log")
@@ -61,6 +72,7 @@ class LoggingConfig(BaseConfigSettings):
 
 class Config(BaseModel):
     fomc_downloader: FOMCSettings = Field(default_factory=FOMCSettings)
+    note_downloader: NoteSettings = Field(default_factory=NoteSettings)
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
 
 
