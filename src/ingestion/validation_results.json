@@ -1,0 +1,2862 @@
+{
+  "data/raw/implementation20240612.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20240612.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3098,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20230322.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20230322.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3224,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20230726a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20230726a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 191673,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20251029a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20251029a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 172946,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20231213.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20231213.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 24,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 203218,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20230726.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20230726.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3269,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20201105.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20201105.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 24,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 216573,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20220504a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20220504a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 313407,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20230726.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20230726.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 10,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 412044,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20221214.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20221214.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1598382,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20230322.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20230322.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 11,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 406112,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20220727.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20220727.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 29,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 236745,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20240612.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20240612.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 10,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 305260,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20221214a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20221214a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 239557,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20220727a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20220727a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 305756,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20220126.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20220126.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3607,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20210616a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20210616a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 234480,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20211103.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20211103.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 29,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 230233,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20231213.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20231213.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1597263,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20221214.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20221214.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 23,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 207587,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20201105a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20201105a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 274830,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20220126.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20220126.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 20,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 419573,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20220316a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20220316a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 291991,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20221214.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20221214.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 12,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 411328,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20211103.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20211103.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3683,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20240612.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20240612.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1278401,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20230322.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20230322.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1564741,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20220126.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20220126.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 28,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 221066,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20240131a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20240131a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 133448,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20211103.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20211103.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 12,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 374988,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20250507a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20250507a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 202692,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20221214.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20221214.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3321,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20200429a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20200429a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 219741,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20201105.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20201105.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3173,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20250129a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20250129a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 199189,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20230726.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20230726.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 28,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 226715,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20231213.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20231213.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3067,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20230322.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20230322.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 23,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 210163,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20240612.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20240612.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 27,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 222911,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20220727.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20220727.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 12,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 390903,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20210922a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20210922a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 335971,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20220727.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20220727.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3743,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20231213a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20231213a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 177659,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20231213.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20231213.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 10,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 397088,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20230503a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20230503a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 253255,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20210428a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20210428a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 229567,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20201105.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20201105.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 14,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 360692,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20211215.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20211215.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 31,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 232901,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20250507.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20250507.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 25,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 219937,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20200916.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20200916.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3577,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20240918.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20240918.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1421081,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20210127.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20210127.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 19,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 446290,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20241218.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20241218.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 28,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 235914,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20210127.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20210127.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3225,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20200916.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20200916.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 27,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1288029,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20221102.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20221102.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 23,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 207787,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20240501a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20240501a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 134792,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20240918.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20240918.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 26,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 270740,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20211215.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20211215.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1595065,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20240501.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20240501.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 26,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 211856,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20201216.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20201216.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3585,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20241218.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20241218.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1284987,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20250618a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20250618a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 138722,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20231101.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20231101.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 10,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 349745,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20231101.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20231101.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3094,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20251210a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20251210a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 178358,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20250129.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20250129.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 27,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 262941,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20250917a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20250917a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 207980,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20201216.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20201216.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 12,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 416846,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20200303a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20200303a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 85137,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20250129.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20250129.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 21,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 1275562,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20201216.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20201216.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 30,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 229102,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20240501.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20240501.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3549,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20240918.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20240918.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3223,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20200916.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20200916.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 5,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 310654,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20240918.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20240918.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 16,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 175953,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20200323a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20200323a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 42801,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20210728a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20210728a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 233808,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20240501.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20240501.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 11,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 384320,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20250129.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20250129.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3120,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20231101.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20231101.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 27,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 224297,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20241218.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20241218.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3393,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20201216.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20201216.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1476448,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20210127a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20210127a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 186702,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20200916.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20200916.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 32,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 271229,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20221102.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20221102.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 12,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 371673,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20250507.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20250507.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3038,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20200610a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20200610a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 268527,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20211215.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20211215.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3626,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20200729a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20200729a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 269010,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20211215.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20211215.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 14,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 356564,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20250507.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20250507.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 19,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 450568,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20221102.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20221102.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3291,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20211103a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20211103a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 5,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 298812,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20210127.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20210127.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 28,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 222378,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20241218.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20241218.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 429577,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20230614a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20230614a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 198332,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20250319.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20250319.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3169,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20210728.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20210728.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 15,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 418196,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20210317.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20210317.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1557841,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20220615.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20220615.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3245,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20240320a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20240320a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 143097,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20250917.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20250917.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 26,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 217921,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20240320.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20240320.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3058,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20250730.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20250730.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 24,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 222261,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20200729.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20200729.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 29,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 223631,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20240731.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20240731.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 16,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 143288,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20200315.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20200315.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 14,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 372762,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20240731a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20240731a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 125185,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20230201.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20230201.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 13,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 414082,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20230201.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20230201.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3310,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20240731.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20240731.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3117,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20200315.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20200315.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3576,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20210922.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20210922.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 27,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 211018,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20230614.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20230614.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 26,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 226975,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20240320.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20240320.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 11,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 294591,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20251210.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20251210.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3033,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20220615.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20220615.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 12,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 325528,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20210728.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20210728.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3756,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20250319.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20250319.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 18,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 435301,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20250917.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20250917.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1341748,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20220615a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20220615a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 281361,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20201013a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20201013a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 16372,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20210317.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20210317.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 30,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 224709,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20200129.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20200129.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3688,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20211215a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20211215a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 337503,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20250730a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20250730a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 225118,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20200303.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20200303.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3676,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20251029.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20251029.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 28,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 227120,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20240131.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20240131.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 27,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 232326,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20230614.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20230614.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1412451,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20210922.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20210922.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1590163,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20200129.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20200129.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 19,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 447267,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20201216a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20201216a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 276820,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20240131.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20240131.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 11,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 367967,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20251029.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20251029.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3627,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20200303.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20200303.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 7,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 45476,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20241107a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20241107a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 204588,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20200723a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20200723a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 90210,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20200129.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20200129.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 28,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 112761,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20210317.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20210317.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3566,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20250319.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20250319.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1542300,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20220615.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20220615.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1560558,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20240320.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20240320.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1539973,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20240918a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20240918a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 115977,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20251210.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20251210.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1339924,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20210317.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20210317.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 13,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 427822,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20230920a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20230920a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 173250,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20240131.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20240131.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3072,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20251029.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20251029.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 21,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 457797,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20210922.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20210922.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 13,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 400762,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20200729.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20200729.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3201,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20230614.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20230614.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 11,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 374963,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20250730.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20250730.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3038,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20240320.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20240320.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 24,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 208111,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20250917.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20250917.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3191,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20220615.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20220615.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 27,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 221909,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20250319.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20250319.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 28,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 263987,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20210728.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20210728.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 29,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 224680,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20251210.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20251210.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 26,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 190080,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20250917.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20250917.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 16,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 465728,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20210317a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20210317a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 339598,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20250730.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20250730.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 18,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 448093,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20230614.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20230614.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3058,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20200729.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20200729.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 13,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 392148,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20230201a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20230201a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 267827,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20210922.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20210922.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3511,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20220921a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20220921a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 201299,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20200315.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20200315.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 21,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 85003,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20240731.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20240731.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 25,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 247578,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20230201.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20230201.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 23,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 208952,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20210428.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20210428.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3178,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20230920.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20230920.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3095,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20250618.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20250618.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1279926,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20210616.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20210616.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3322,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20240612a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20240612a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 267293,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20210616.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20210616.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 14,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 454024,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20220316.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20220316.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 26,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 228197,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20210428.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20210428.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 13,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 345359,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20230920.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20230920.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 10,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 294947,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20220504.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20220504.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 24,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 209784,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20220921.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20220921.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 21,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 200139,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20200429.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20200429.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 24,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 212641,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20230503.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20230503.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 25,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 211739,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20241107.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20241107.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 23,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 239594,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20200610.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20200610.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3558,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20250618.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20250618.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 28,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 217624,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20200129a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20200129a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 149371,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20220316.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20220316.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1558349,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20241218a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20241218a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 190006,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20200610.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20200610.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 27,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1207828,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20220921.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20220921.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1596845,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20230920.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20230920.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1434940,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20210616.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20210616.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 1471156,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20250618.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20250618.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3040,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20200315a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20200315a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 115002,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20200610.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20200610.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 30,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 221589,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20241107.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20241107.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3309,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20221102a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20221102a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 239256,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20230503.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20230503.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3258,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20220126a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20220126a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 360047,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20230503.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20230503.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 12,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 406372,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20200916a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20200916a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 342863,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20231101a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20231101a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 168393,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20241107.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20241107.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 17,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 141693,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20250618.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20250618.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 18,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 494815,
+      "errors": []
+    }
+  },
+  "data/raw/fomcprojtabl20200610.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcprojtabl20200610.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 5,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 317494,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20210616.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20210616.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 30,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 235585,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20230322a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20230322a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 175155,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20220316.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20220316.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 12,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 393297,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20230920.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20230920.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 28,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 253214,
+      "errors": []
+    }
+  },
+  "data/raw/FOMCpresconf20210428.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/FOMCpresconf20210428.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 29,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 198794,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20220504.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20220504.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 12,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 388925,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20200429.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20200429.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 13,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 402574,
+      "errors": []
+    }
+  },
+  "data/raw/fomcminutes20220921.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/fomcminutes20220921.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 12,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 349248,
+      "errors": []
+    }
+  },
+  "data/raw/monetary20250319a1.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/monetary20250319a1.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 4,
+      "has_text": true,
+      "has_images": true,
+      "file_size": 193811,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20200429.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20200429.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3077,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20220921.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20220921.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3298,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20220504.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20220504.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 3,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3754,
+      "errors": []
+    }
+  },
+  "data/raw/implementation20220316.pdf": {
+    "valid": true,
+    "info": {
+      "file_path": "data/raw/implementation20220316.pdf",
+      "exists": true,
+      "can_open": true,
+      "num_pages": 2,
+      "has_text": true,
+      "has_images": false,
+      "file_size": 3195,
+      "errors": []
+    }
+  }
+}
