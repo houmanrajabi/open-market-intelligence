@@ -164,6 +164,35 @@ class PDFValidator:
             path_to_id[path]: result
             for path, result in results.items()
         }
+    
+import pdfplumber
+
+def advanced_pdf_detection(pdf_path):
+    """More detailed analysis using pdfplumber"""
+    logger.debug(f"Performing standard and scaned pdf detection on {pdf_path}")
+    
+    with pdfplumber.open(pdf_path) as pdf:
+        first_page = pdf.pages[0]
+        
+        # Check for actual text objects
+        chars = first_page.chars  # Text characters as objects
+        images = first_page.images
+        
+        logger.debug(f"First page analysis for {pdf_path}:")
+        logger.debug(f"Text objects: {len(chars)}")
+        logger.debug(f"Image objects: {len(images)}")   
+
+        result_details = {
+            "text_chars": len(chars),
+            "image_objects": len(images)
+        }
+        
+        if len(chars) > 50:
+            return "standard", result_details
+        elif len(images) > 0:
+            return "scanned", result_details
+        else:
+            return "unknown", result_details
 
 
 def main():
@@ -184,6 +213,12 @@ def main():
         help="Output JSON file for validation results"
     )
 
+    parser.add_argument(
+        "--pdf-standard-scan-detect",
+        action="store_true",
+        help="Perform standard vs scanned pdf detection using pdfplumber"
+    )
+
     args = parser.parse_args()
 
     # Find all PDFs
@@ -197,12 +232,24 @@ def main():
     validator = PDFValidator()
     results = validator.validate_batch(pdf_files)
 
+    # Store scan results in a dictionary
+    scan_results = {}
+    if args.pdf_standard_scan_detect:
+        for pdf_path in pdf_files:
+            scan_type, result_details = advanced_pdf_detection(pdf_path)  # Unpack tuple
+            scan_results[str(pdf_path)] = {
+                "scan_type": scan_type,
+                "details": result_details
+            }
+            logger.debug(f"{pdf_path.name}: {scan_type}")
+
     # Save results if requested
     if args.output_file:
         output_data = {
             str(path): {
                 "valid": is_valid,
-                "info": info
+                "info": info,
+                "scan_info": scan_results.get(str(path), None)  # Add scan results here
             }
             for path, (is_valid, info) in results.items()
         }
@@ -215,3 +262,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+#testing code 
+# python -m src.ingestion.validator --input-dir data/raw --pdf-standard-scan-detect --output-file data/output/ingestion_validation_results.json
