@@ -1,0 +1,478 @@
+import fitz  # PyMuPDF
+import uuid
+import os
+import json
+import re
+from PIL import Image, ImageDraw, ImageFont
+from src.processing.extractors.qwen_extractor_a import extract_page_data
+from typing import Dict, List, Tuple, Optional
+import logging
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
+
+# --- COORDINATE UTILITIES ---
+
+def scale_rect_from_1000(bbox_1000, target_w, target_h):
+    """Converts 0-1000 normalized coordinates to absolute pixels/points."""
+    ymin, xmin, ymax, xmax = bbox_1000
+    return (
+        int(xmin / 1000 * target_w),
+        int(ymin / 1000 * target_h),
+        int(xmax / 1000 * target_w),
+        int(ymax / 1000 * target_h)
+    )
+
+def calculate_overlap(bbox1, bbox2):
+    """Calculate intersection over union (IoU) for two bboxes."""
+    y1_min, x1_min, y1_max, x1_max = bbox1
+    y2_min, x2_min, y2_max, x2_max = bbox2
+    
+    # Calculate intersection
+    x_left = max(x1_min, x2_min)
+    y_top = max(y1_min, y2_min)
+    x_right = min(x1_max, x2_max)
+    y_bottom = min(y1_max, y2_max)
+    
+    if x_right < x_left or y_bottom < y_top:
+        return 0.0
+    
+    intersection = (x_right - x_left) * (y_bottom - y_top)
+    area1 = (x1_max - x1_min) * (y1_max - y1_min)
+    area2 = (x2_max - x2_min) * (y2_max - y2_min)
+    union = area1 + area2 - intersection
+    
+    return intersection / union if union > 0 else 0.0
+
+# --- VISUAL DEBUG UTILITIES ---
+
+def create_debug_overlay(image, layout_map, output_path):
+    """Draws colored boxes with improved visibility."""
+    debug_img = image.copy()
+    draw = ImageDraw.Draw(debug_img)
+    
+    try:
+        font = ImageFont.truetype("arial.ttf", 24)
+        label_font = ImageFont.truetype("arial.ttf", 16)
+    except:
+        font = ImageFont.load_default()
+        label_font = font
+    
+    styles = {
+        "TABLE":  {"color": "red", "width": 5},
+        "FIGURE": {"color": "blue", "width": 5},
+        "HEADER": {"color": "green", "width": 4},
+        "TEXT":   {"color": "orange", "width": 3},
+        "FOOTER": {"color": "gray", "width": 2}
+    }
+    
+    w, h = debug_img.size
+    for idx, item in enumerate(layout_map.get("layout", [])):
+        etype = item.get("type", "TEXT")
+        bbox = item.get("bbox", [0,0,0,0])
+        x0, y0, x1, y1 = scale_rect_from_1000(bbox, w, h)
+        
+        style = styles.get(etype, styles["TEXT"])
+        
+        # Draw rectangle
+        draw.rectangle([x0, y0, x1, y1], outline=style["color"], width=style["width"])
+        
+        # Draw label with background
+        label = f"{idx}: {etype}"
+        label_bbox = draw.textbbox((x0 + 5, y0 - 30), label, font=label_font)
+        draw.rectangle(label_bbox, fill=style["color"])
+        draw.text((x0 + 5, y0 - 30), label, fill="white", font=label_font)
+    
+    debug_img.save(output_path)
+    logger.info(f"Debug overlay saved: {output_path}")
+
+# --- READING ORDER LOGIC ---
+
+def detect_multi_column(layout_elements: List[dict], threshold: float = 0.3) -> bool:
+    """Detect if layout has multiple columns."""
+    if len(layout_elements) < 3:
+        return False
+    
+    # Check horizontal spacing between elements
+    x_positions = []
+    for elem in layout_elements:
+        if elem.get("type") != "HEADER":
+            bbox = elem.get("bbox", [0, 0, 0, 0])
+            x_center = (bbox[1] + bbox[3]) / 2
+            x_positions.append(x_center)
+    
+    if len(x_positions) < 2:
+        return False
+    
+    # Look for clustering in x positions
+    x_positions.sort()
+    gaps = [x_positions[i+1] - x_positions[i] for i in range(len(x_positions)-1)]
+    
+    if not gaps:
+        return False
+    
+    max_gap = max(gaps)
+    avg_gap = sum(gaps) / len(gaps)
+    
+    # If there's a large gap (column separator), it's multi-column
+    return max_gap > avg_gap * 3
+
+def sort_reading_order(layout_elements: List[dict]) -> List[dict]:
+    """Intelligent reading order sorting."""
+    
+    if not layout_elements:
+        return []
+    
+    # Separate headers (should come first)
+    headers = [e for e in layout_elements if e.get("type") == "HEADER"]
+    non_headers = [e for e in layout_elements if e.get("type") != "HEADER"]
+    
+    # Sort headers by vertical position
+    headers.sort(key=lambda e: e["bbox"][0])
+    
+    # Check for multi-column
+    if detect_multi_column(non_headers):
+        logger.info("Multi-column layout detected")
+        non_headers = sort_multi_column(non_headers)
+    else:
+        # Simple top-to-bottom, left-to-right
+        non_headers.sort(key=lambda e: (e["bbox"][0], e["bbox"][1]))
+    
+    return headers + non_headers
+
+def sort_multi_column(elements: List[dict]) -> List[dict]:
+    """Sort multi-column layout by columns, then by vertical position."""
+    
+    # Find column boundaries
+    x_centers = [(e["bbox"][1] + e["bbox"][3]) / 2 for e in elements]
+    x_centers.sort()
+    
+    # Use k-means like clustering (simplified)
+    if len(x_centers) < 2:
+        return sorted(elements, key=lambda e: e["bbox"][0])
+    
+    mid_point = (max(x_centers) + min(x_centers)) / 2
+    
+    left_col = [e for e in elements if (e["bbox"][1] + e["bbox"][3]) / 2 < mid_point]
+    right_col = [e for e in elements if (e["bbox"][1] + e["bbox"][3]) / 2 >= mid_point]
+    
+    # Sort each column vertically
+    left_col.sort(key=lambda e: e["bbox"][0])
+    right_col.sort(key=lambda e: e["bbox"][0])
+    
+    # Interleave based on vertical position
+    result = []
+    i, j = 0, 0
+    
+    while i < len(left_col) and j < len(right_col):
+        if left_col[i]["bbox"][0] < right_col[j]["bbox"][0]:
+            result.append(left_col[i])
+            i += 1
+        else:
+            result.append(right_col[j])
+            j += 1
+    
+    result.extend(left_col[i:])
+    result.extend(right_col[j:])
+    
+    return result
+
+# --- TEXT EXTRACTION WITH STRUCTURE PRESERVATION ---
+
+def extract_text_with_structure(page, bbox_1000, pdf_w, pdf_h) -> str:
+    """Extract text preserving paragraph structure."""
+    
+    x0, y0, x1, y1 = scale_rect_from_1000(bbox_1000, pdf_w, pdf_h)
+    
+    # Add safety padding
+    pad = 3
+    safe_rect = fitz.Rect(
+        max(0, x0 - pad),
+        max(0, y0 - pad),
+        min(pdf_w, x1 + pad),
+        min(pdf_h, y1 + pad)
+    )
+    
+    # Extract with layout preservation
+    text_val = page.get_text("text", clip=safe_rect)
+    
+    # Intelligent cleaning
+    # 1. Normalize line breaks (preserve paragraphs)
+    text_val = re.sub(r'\n{3,}', '\n\n', text_val)  # Max 2 consecutive newlines
+    
+    # 2. Fix hyphenated words at line breaks
+    text_val = re.sub(r'-\n', '', text_val)
+    
+    # 3. Collapse single line breaks within paragraphs
+    lines = text_val.split('\n')
+    cleaned_lines = []
+    
+    for i, line in enumerate(lines):
+        line = line.strip()
+        if not line:
+            # Preserve empty lines (paragraph breaks)
+            if cleaned_lines and cleaned_lines[-1]:
+                cleaned_lines.append('')
+        else:
+            # Check if this continues previous line
+            if (cleaned_lines and 
+                cleaned_lines[-1] and 
+                not line[0].isupper() and 
+                not cleaned_lines[-1].endswith(('.', ':', '!', '?'))):
+                # Continue previous line
+                cleaned_lines[-1] += ' ' + line
+            else:
+                cleaned_lines.append(line)
+    
+    text_val = '\n'.join(cleaned_lines)
+    
+    # 4. Clean up excessive spaces
+    text_val = re.sub(r' +', ' ', text_val)
+    
+    return text_val.strip()
+
+# --- METADATA EXTRACTION ---
+
+def extract_keywords(text: str, content_type: str) -> List[str]:
+    """Extract keywords from text based on content type."""
+    
+    # Domain-specific keyword patterns
+    patterns = {
+        "economic": r'\b(GDP|inflation|unemployment|rate|growth|projection|estimate|forecast|basis points?|percent)\b',
+        "financial": r'\b(revenue|profit|loss|margin|assets|liabilities|equity|earnings)\b',
+        "dates": r'\b(\d{4}|Q[1-4]|\d{1,2}/\d{1,2}/\d{2,4})\b'
+    }
+    
+    keywords = set()
+    text_lower = text.lower()
+    
+    for category, pattern in patterns.items():
+        matches = re.findall(pattern, text_lower, re.IGNORECASE)
+        keywords.update(matches)
+    
+    # Limit to top 10 most relevant
+    return list(keywords)[:10]
+
+def extract_entities(text: str) -> Dict[str, List[str]]:
+    """Simple entity extraction (can be enhanced with NER models)."""
+    
+    entities = {
+        "organizations": [],
+        "locations": [],
+        "dates": []
+    }
+    
+    # Pattern-based extraction
+    org_patterns = [
+        r'\b(Federal Reserve|FOMC|Board of Governors|Federal Reserve Bank)\b',
+        r'\b([A-Z][a-z]+ [A-Z][a-z]+ (Committee|Board|Bank|Corporation|Inc\.))\b'
+    ]
+    
+    for pattern in org_patterns:
+        matches = re.findall(pattern, text)
+        entities["organizations"].extend([m if isinstance(m, str) else m[0] for m in matches])
+    
+    # Date extraction
+    date_pattern = r'\b((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4})\b'
+    entities["dates"] = re.findall(date_pattern, text)
+    
+    return entities
+
+def calculate_quality_score(element: dict) -> float:
+    """Calculate extraction quality score."""
+    
+    base_score = element.get("extraction_quality", 0.7)
+    
+    # Penalties
+    content = element.get("content", "")
+    
+    if len(content) < 10:
+        base_score -= 0.2
+    
+    if "EXTRACTION_FAILED" in content:
+        return 0.0
+    
+    if element.get("validation_status") == "FAIL":
+        base_score -= 0.3
+    elif element.get("validation_status") == "PARTIAL":
+        base_score -= 0.1
+    
+    # Bonuses
+    if element.get("structured_data"):
+        base_score += 0.1
+    
+    return max(0.0, min(1.0, base_score))
+
+# --- MAIN EXTRACTION FUNCTION ---
+
+def extract_hybrid_content(
+    pdf_path: str,
+    page_num: int,
+    layout_map: dict,
+    temp_image_path: str,
+    output_dir: str,
+    previous_context: Optional[str] = None,
+    document_metadata: Optional[dict] = None
+) -> Tuple[List[dict], str]:
+    """
+    Enhanced hybrid extraction with validation, metadata, and quality scoring.
+    
+    Returns:
+        (extracted_elements, last_active_anchor)
+    """
+    
+    doc = fitz.open(pdf_path)
+    page = doc[page_num - 1]
+    pdf_w, pdf_h = page.rect.width, page.rect.height
+    
+    full_image = Image.open(temp_image_path)
+    img_w, img_h = full_image.size
+    
+    # 1. Save visual assets
+    clean_path = os.path.join(output_dir, f"page_{page_num}_clean.jpg")
+    debug_path = os.path.join(output_dir, f"page_{page_num}_debug.jpg")
+    
+    if not os.path.exists(clean_path):
+        full_image.save(clean_path, quality=95)
+    
+    create_debug_overlay(full_image, layout_map, debug_path)
+    
+    extracted_elements = []
+    
+    # 2. Sort by intelligent reading order
+    sorted_layout = sort_reading_order(layout_map.get("layout", []))
+    
+    logger.info(f"Processing {len(sorted_layout)} elements in reading order")
+    
+    # 3. Context management with reset logic
+    current_section_anchor = previous_context or "Document Content"
+    section_start_page = page_num if not previous_context else None
+    
+    for index, item in enumerate(sorted_layout):
+        element_type = item.get("type", "TEXT")
+        bbox_1000 = item.get("bbox", [0, 0, 0, 0])
+        element_id = f"{os.path.basename(pdf_path).replace('.pdf', '')}_p{page_num}_{index}"
+        
+        # --- ANCHOR DETECTION & MANAGEMENT ---
+        if element_type == "HEADER":
+            x0, y0, x1, y1 = scale_rect_from_1000(bbox_1000, pdf_w, pdf_h)
+            header_rect = fitz.Rect(x0, y0, x1, y1)
+            header_text = page.get_text("text", clip=header_rect).strip().replace("\n", " ")
+            
+            if len(header_text) > 5:
+                current_section_anchor = header_text
+                section_start_page = page_num
+                logger.info(f"⚓ New Section: {current_section_anchor[:50]}...")
+        
+        # --- FOOTER DETECTION (triggers anchor reset) ---
+        elif element_type == "FOOTER":
+            # Check if footer indicates end of section
+            x0, y0, x1, y1 = scale_rect_from_1000(bbox_1000, pdf_w, pdf_h)
+            footer_rect = fitz.Rect(x0, y0, x1, y1)
+            footer_text = page.get_text("text", clip=footer_rect).lower()
+            
+            if any(marker in footer_text for marker in ["end of section", "***", "---"]):
+                logger.info("🔄 Section end detected, resetting anchor")
+                current_section_anchor = "Document Content"
+        
+        # --- VISUAL EXTRACTION (VLM) ---
+        if element_type in ["TABLE", "FIGURE", "CHART"]:
+            logger.info(f"🖼️  Extracting {element_type} at element {index}")
+            
+            # Crop with padding
+            x0, y0, x1, y1 = scale_rect_from_1000(bbox_1000, img_w, img_h)
+            pad = 20
+            crop_coords = (
+                max(0, x0 - pad),
+                max(0, y0 - pad),
+                min(img_w, x1 + pad),
+                min(img_h, y1 + pad)
+            )
+            
+            crop_filename = f"crop_{element_id}.jpg"
+            crop_path = os.path.join(output_dir, crop_filename)
+            full_image.crop(crop_coords).save(crop_path, quality=95)
+            
+            # Extract with VLM
+            try:
+                vlm_result = extract_page_data(crop_path, element_type)
+                
+                # Build element with rich metadata
+                element = {
+                    "id": element_id,
+                    "page": page_num,
+                    "type": element_type,
+                    "section_anchor": current_section_anchor,
+                    "bbox_norm": bbox_1000,
+                    "content": vlm_result.get("content", ""),
+                    "summary": vlm_result.get("summary", ""),
+                    "structured_data": vlm_result.get("structured_data"),
+                    "extraction_method": "VLM",
+                    "extraction_quality": calculate_quality_score(vlm_result),
+                    "validation_status": vlm_result.get("validation_status", "UNKNOWN"),
+                    "metadata": {
+                        "keywords": extract_keywords(vlm_result.get("content", ""), "economic"),
+                        "contains_numerical_data": bool(re.search(r'\d+\.?\d*', vlm_result.get("content", ""))),
+                        "chart_type": vlm_result.get("chart_type"),
+                        "column_count": len(vlm_result.get("columns", [])) if vlm_result.get("columns") else None
+                    },
+                    "visual_ref": {
+                        "clean_page": f"page_{page_num}_clean.jpg",
+                        "debug_page": f"page_{page_num}_debug.jpg",
+                        "crop_file": crop_filename
+                    }
+                }
+                
+                extracted_elements.append(element)
+                
+            except Exception as e:
+                logger.error(f"❌ VLM extraction failed for {element_id}: {e}")
+                # Add placeholder element to maintain document structure
+                extracted_elements.append({
+                    "id": element_id,
+                    "page": page_num,
+                    "type": element_type,
+                    "section_anchor": current_section_anchor,
+                    "bbox_norm": bbox_1000,
+                    "content": f"[Extraction failed: {str(e)}]",
+                    "extraction_quality": 0.0,
+                    "validation_status": "FAIL",
+                    "error": str(e)
+                })
+        
+        # --- TEXT EXTRACTION (PyMuPDF) ---
+        else:
+            text_val = extract_text_with_structure(page, bbox_1000, pdf_w, pdf_h)
+            
+            if len(text_val) > 5:
+                entities = extract_entities(text_val)
+                
+                element = {
+                    "id": element_id,
+                    "page": page_num,
+                    "type": element_type,
+                    "section_anchor": current_section_anchor,
+                    "bbox_norm": bbox_1000,
+                    "content": text_val,
+                    "extraction_method": "PyMuPDF",
+                    "extraction_quality": 0.9,  # High confidence for direct text extraction
+                    "metadata": {
+                        "word_count": len(text_val.split()),
+                        "char_count": len(text_val),
+                        "keywords": extract_keywords(text_val, "economic"),
+                        "entities": entities,
+                        "contains_numerical_data": bool(re.search(r'\d+', text_val))
+                    },
+                    "visual_ref": {
+                        "clean_page": f"page_{page_num}_clean.jpg",
+                        "debug_page": f"page_{page_num}_debug.jpg"
+                    }
+                }
+                
+                extracted_elements.append(element)
+    
+    doc.close()
+    
+    logger.info(f"✅ Page {page_num}: Extracted {len(extracted_elements)} elements")
+    
+    return extracted_elements, current_section_anchor
