@@ -6,3 +6,4 @@ venv/
 output
 logs/.gitkeep 
 logs/*.log
+.env

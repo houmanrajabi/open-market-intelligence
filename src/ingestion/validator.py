@@ -263,4 +263,4 @@ def main():
 if __name__ == "__main__":
     main()
 #testing code 
-# python -m src.ingestion.validator --input-dir data/raw --pdf-standard-scan-detect --output-file data/output/ingestion_validation_results.json
+# python -m src.ingestion.validator --input-dir data/raw --pdf-standard-scan-detect --output-file data/output/ingestion/ingestion_validation_results.json

@@ -70,10 +70,25 @@ class LoggingConfig(BaseConfigSettings):
         "env_prefix": "LOGGING__",  
     }
 
+class DataSettings(BaseConfigSettings):
+    """Data directories configuration"""
+    data_dir: Path = Field(default_factory=lambda: Path(os.getenv("DATA_DIR", "./data")))
+    raw_data_dir: Path = Field(default_factory=lambda: Path(os.getenv("RAW_DATA_DIR", "./data/raw")))
+    processed_data_dir: Path = Field(default_factory=lambda: Path(os.getenv("PROCESSED_DATA_DIR", "./data/processed")))
+    test_set_dir: Path = Field(default_factory=lambda: Path(os.getenv("TEST_SET_DIR", "./data/test_set")))
+
+    model_config = {
+        **BaseConfigSettings.model_config,
+        "env_prefix": "DATA__",  # Allows env overrides like DATA__RAW_DATA_DIR
+    }
+
 class Config(BaseModel):
     fomc_downloader: FOMCSettings = Field(default_factory=FOMCSettings)
     note_downloader: NoteSettings = Field(default_factory=NoteSettings)
     logging: LoggingConfig = Field(default_factory=LoggingConfig)
+    data: DataSettings = Field(default_factory=DataSettings)
+
+
 
 
 # Global config instance
