@@ -1,0 +1,94 @@
+\begin{tikzpicture}[
+    node distance=1.5cm and 2cm,
+    font=\small\sffamily,
+    % Styles
+    process/.style={rectangle, draw=processBlue, thick, fill=white, minimum width=2.5cm, minimum height=1cm, align=center, rounded corners},
+    data/.style={cylinder, draw=black, aspect=0.25, shape border rotate=90, fill=dataGray, minimum width=2cm, minimum height=1.5cm, align=center},
+    document/.style={tape, tape bend top=none, draw=black, fill=white, minimum width=2cm, minimum height=1.2cm, align=center},
+    decision/.style={diamond, draw=unitoRed, thick, fill=white, aspect=2, minimum width=2.5cm, align=center},
+    arrow/.style={-Latex, thick, rounded corners},
+    label/.style={font=\footnotesize\itshape, fill=white, inner sep=1pt} % Added fill=white to labels for readability
+]
+
+% --- LANE 1: INGESTION (Hybrid Extractor) ---
+\node[document] (pdf) {FOMC\\PDFs};
+\node[process, right=of pdf] (vlm) {\textbf{Qwen2-VL}\\(Layout Analysis)};
+\node[process, right=of vlm, align=left, font=\scriptsize] (elements) {
+    \textbf{Splitter}:\\
+    - Text (OCR)\\
+    - Tables (CSV)\\
+    - Charts (JSON)
+};
+\node[process, right=of elements] (embed) {\textbf{Embedder}\\(text-embedding-3)};
+\node[data, right=of embed] (vectordb) {\textbf{Vector DB}\\(Chroma)};
+
+% --- LANE 2: RETRIEVAL & GENERATION ---
+\node[document, below=5.5cm of pdf] (query) {User\\Query};
+\node[process, right=of query] (retrieval) {\textbf{Retrieval}\\(Top-K)};
+
+% Llama-3 Model Block
+\node[process, right=of retrieval, minimum height=2cm, fill=processBlue!10] (llama) {
+    \textbf{Student Model}\\
+    (Llama-3-8B)\\
+    \textit{+ DPO Weights}
+};
+
+% Entropy Module
+\node[process, right=of llama, draw=unitoRed] (entropy) {
+    \textbf{Uncertainty}\\
+    \textbf{Module}\\
+    $H(t) = -\sum p \log p$
+};
+
+% Decision Gate
+\node[decision, below=of entropy] (gate) {Entropy\\$< 1.5$?};
+
+% Outcomes
+\node[document, left=of gate] (output) {Final\\Answer};
+\node[process, right=of gate, fill=unitoRed!10] (reprompt) {\textbf{Expand $K$}\\ \& Retry};
+
+% --- ALIGNMENT (Teacher Agent) ---
+\node[process, above=2.0cm of llama, fill=gray!10, dashed] (teacher) {
+    \textbf{Teacher Agent}\\
+    (GPT-4-Turbo)
+};
+
+% --- CONNECTIONS ---
+
+% Ingestion Flow
+\draw[arrow] (pdf) -- (vlm);
+\draw[arrow] (vlm) -- (elements);
+\draw[arrow] (elements) -- (embed);
+\draw[arrow] (embed) -- (vectordb);
+
+% Retrieval Flow
+\draw[arrow] (query) -- (retrieval);
+
+% FIX: Squared path for Context to avoid cutting through Teacher/Student
+% Path goes: VectorDB Bottom -> Down to mid-height -> Left across -> Down to Retrieval
+\draw[arrow] (vectordb.south) |- ++(0,-1.5) -| node[pos=0.25, above, label] {Context (Chunks)} (retrieval.north);
+
+\draw[arrow] (retrieval) -- (llama);
+
+% Generation & Entropy Flow
+\draw[arrow] (llama) -- node[above, label] {Logits} (entropy);
+\draw[arrow] (entropy) -- (gate);
+
+% Decision Logic
+\draw[arrow] (gate) -- node[above, label] {Yes} (output);
+\draw[arrow] (gate) -- node[above, label] {No} (reprompt);
+
+% Feedback Loop path
+\draw[arrow] (reprompt.east) -- ++(0.5,0) |- (retrieval.south) node[pos=0.25, right, label] {Feedback Loop};
+
+% Alignment Flow
+\draw[arrow, dashed, red] (teacher) -- node[right, label, red] {DPO Gradients} (llama);
+
+% --- BACKGROUND GROUPING ---
+\begin{scope}[on background layer]
+    \node[fit=(pdf) (vectordb) (vlm), fill=blue!5, rounded corners, label={[anchor=north west, blue]north west:\textbf{Ingestion Pipeline}}] {};
+    % Expanded fit to include feedback loop area comfortably
+    \node[fit=(query) (llama) (gate) (reprompt), fill=green!5, rounded corners, label={[anchor=north west, green!50!black]north west:\textbf{Inference Loop}}] {};
+\end{scope}
+
+\end{tikzpicture}

@@ -14,6 +14,15 @@ The system is architected as a modular pipeline consisting of three decoupled su
     \label{fig:system_arch}
 \end{figure}
 
+\begin{figure}[h]
+    \centering
+    \resizebox{\textwidth}{!}{
+        \input{figures/system_diagram.tex}
+    }
+    \caption{Architecture of the Self-Monitoring Compliance Assistant. The diagram illustrates the Hybrid Visual Ingestion pipeline (top), the Entropy-Aware Inference loop (bottom), and the offline DPO Alignment signal (dashed).}
+    \label{fig:system_arch}
+\end{figure}
+
 \section{Subsystem 1: The Visual-First Ingestion Pipeline}
 Unlike traditional RAG systems that rely on text-only parsing (e.g., \texttt{pypdf}), this system implements a "Visual-First" strategy to preserve the semantic structure of regulatory documents.
 
