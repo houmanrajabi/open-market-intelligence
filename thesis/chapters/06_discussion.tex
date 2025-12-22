@@ -1,0 +1,54 @@
+\chapter{Discussion and Limitations}
+\label{ch:discussion}
+
+This chapter interprets the theoretical implications of the proposed "Self-Monitoring Compliance Assistant." It critically analyzes the limitations of using entropy as a proxy for epistemic uncertainty, discusses the risks of relying on AI-generated feedback (RLAIF), and addresses the ethical constraints of deploying probabilistic systems in high-stakes regulatory environments.
+
+\section{The Reliability of Entropy as a Signal}
+
+Research Question 1 (RQ1) posited that token-level entropy could serve as a useful indicator of answer reliability. While entropy provides a granular view of the model's next-token prediction surface, this research highlights a critical distinction between \textit{uncertainty} and \textit{ambiguity}.
+
+\subsection{The "Confident Hallucination" Paradox}
+A fundamental limitation identified in our design is that Shannon entropy ($H(t)$) measures the model's confusion between token choices, not the factual correctness of the statement.
+\begin{itemize}
+    \item \textbf{Low Entropy $\neq$ Truth:} A model may confidently hallucinate a plausible-sounding but non-existent regulation (e.g., "The 2024 Crypto Act") if its pre-training weights strongly associate those terms. In such cases, the entropy gate ($\bar{H} < 1.5$) may fail to trigger.
+    \item \textbf{High Entropy $\neq$ Error:} Conversely, genuine linguistic ambiguity in the source text (e.g., "The Committee was somewhat concerned") may trigger high entropy even when the model is correctly reporting the ambiguity.
+\end{itemize}
+Therefore, entropy should be viewed as a "First Line of Defense" rather than a guarantee of correctness. Future work must investigate \textit{Semantic Entropy}, which clusters meanings across multiple sampled generations to distinguish lexical variety from semantic uncertainty.
+
+\section{The "Teacher" Problem in RLAIF}
+
+Our alignment strategy (RQ2) relies on a "Teacher" model (GPT-4) to grade the "Student" (Llama-3). This introduces a circular dependency known as \textit{Reward Hacking} or the \textit{Teacher Gap}.
+
+\subsection{Optimization for Preference vs. Truth}
+By optimizing Llama-3 against GPT-4's preferences (via DPO), we are implicitly assuming that GPT-4 is a perfect proxy for ground truth. However, if the Teacher model shares the same biases or blind spots as the Student (e.g., neglecting "negation traps" in complex sentences), the DPO process may reinforce these errors rather than correct them.
+
+To mitigate this, our experimental design includes a "Human Audit" of 10\% of Teacher grades. Preliminary analysis suggests that while RLAIF significantly reduces obvious formatting errors, it may struggle to detect subtle "citation misattributions," where the model cites a correct document ID but an irrelevant paragraph.
+
+\section{Technical Fragility in Visual Ingestion}
+
+While our Hybrid Visual-Textual Extractor offers superior performance on tables compared to standard text strippers, it introduces new vectors of fragility:
+\begin{itemize}
+    \item \textbf{Stochastic Inference:} The reliance on a VLM (\texttt{Qwen2-VL}) for layout analysis means that the same PDF page can occasionally yield different bounding boxes across runs, necessitating the robust retry logic implemented in our pipeline.
+    \item \textbf{Computational Cost:} The "Visual-First" approach increases the indexing cost by orders of magnitude compared to text-only ingestion, raising questions about the scalability of this approach for massive legal corpora.
+\end{itemize}
+
+\section{Threats to Validity}
+
+\subsection{Generalization Gap}
+This study utilizes FOMC Meeting Minutes due to their availability and structure. However, FOMC documents differ linguistically from binding statutory law (e.g., the U.S. Code or GDPR). FOMC minutes are descriptive narratives of policy discussions, whereas statutes are prescriptive logical rules. Success on this dataset is necessary but insufficient to claim generalizability to broader legal compliance tasks.
+
+\subsection{Proxy Limitations}
+The use of "Citation Precision" and "Hallucination Rate" as primary metrics assumes that these can be measured accurately. While we employ string-matching heuristics and LLM grading, these automated metrics are themselves imperfect proxies for the nuanced "legal correctness" that a human lawyer would assess.
+
+\section{Ethical Considerations}
+
+\subsection{The "Human-in-the-Loop" Mandate}
+Given the probabilistic nature of both the retrieval and generation components, this system must ethically be categorized as a "Decision Support Tool" rather than a "Decision Maker."
+\begin{itemize}
+    \item \textbf{Transparency:} The system must always display the retrieved chunks alongside the answer.
+    \item \textbf{Uncertainty Visualization:} The entropy score should not be hidden but visualized (e.g., as a confidence bar) to allow the user to gauge the reliability of the output.
+\end{itemize}
+
+\section{Conclusion}
+
+This thesis demonstrated that while token-level entropy and RLAIF-driven fine-tuning can incrementally improve the reliability of document-grounded generation, they do not eliminate the risk of hallucination. The "Self-Monitoring" capabilities investigated here represent a step toward safer AI, but the gap between \textit{plausible} text generation and \textit{provable} regulatory compliance remains significant. Future research should focus on \textit{Neuro-Symbolic} approaches that combine the fluency of LLMs with the logical guarantees of formal verification methods.

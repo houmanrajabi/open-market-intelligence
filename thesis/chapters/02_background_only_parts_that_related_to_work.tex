@@ -1,0 +1,64 @@
+\chapter{Background and Related Work}
+\label{ch:background}
+
+This chapter establishes the theoretical foundations for the "Self-Monitoring Compliance Assistant." It begins by characterizing the unique challenges of regulatory compliance as an Information Retrieval (IR) and Natural Language Processing (NLP) domain. Subsequently, it reviews the evolution of Retrieval-Augmented Generation (RAG) systems, the current state of uncertainty estimation in Large Language Models (LLMs), and recent advancements in automated alignment techniques such as Reinforcement Learning from AI Feedback (RLAIF).
+
+\section{The Challenge of Regulatory Compliance}
+
+Regulatory compliance is a high-stakes domain characterized by dense, technical language and a constantly evolving corpus of documents. Unlike general-domain Question Answering (QA), compliance tasks require near-zero tolerance for fabrication ("hallucination") and a strict adherence to source texts.
+
+\subsection{Information Overload and Professional Constraints}
+Compliance professionals are tasked with monitoring a vast array of regulatory bodies, such as the Federal Open Market Committee (FOMC), where policy positions evolve sequentially over time. The cognitive load required to track these changes manually is prohibitive. While automated systems offer a potential solution, their adoption is hindered by the risk of "silent failures"—situations where a model confidently generates incorrect legal or policy interpretations.
+
+\subsection{The Necessity of Grounding}
+In legal and regulatory contexts, an answer is only as valuable as its traceability. A correct answer without a citation is often indistinguishable from a hallucination. Therefore, systems designed for this domain must prioritize "citation precision" and "factual grounding" above fluency or creativity.
+
+\section{Retrieval-Augmented Generation (RAG)}
+
+Retrieval-Augmented Generation (RAG) has emerged as the dominant paradigm for grounding LLMs in external knowledge.
+
+\subsection{Standard Architecture}
+A standard RAG system consists of a dense vector index (typically using embeddings like OpenAI's \texttt{text-embedding-3}) and a generative model (such as Llama-3). The process follows a "Retrieve-then-Generate" workflow:
+\begin{enumerate}
+    \item \textbf{Query Encoding:} The user's question is converted into a vector.
+    \item \textbf{Retrieval:} The system fetches the top-$k$ most similar document chunks (e.g., 512-token segments) via cosine similarity.
+    \item \textbf{Generation:} The retrieved chunks are prepended to the system prompt, and the model generates an answer conditioned on this context.
+\end{enumerate}
+
+
+
+\subsection{Limitations of Naive RAG}
+While effective, naive RAG systems suffer from specific failure modes in high-stakes domains:
+\begin{itemize}
+    \item \textbf{Retrieval Failure:} If the relevant information is not in the top-$k$ chunks, the model may hallucinate an answer based on its pre-training weights rather than admitting ignorance.
+    \item \textbf{Contextual Misinterpretation:} Models may struggle with "negation traps" or "temporal confusion," citing a correct document but misinterpreting its legal implication (e.g., confusing a dissent with a majority opinion).
+\end{itemize}
+
+\section{Uncertainty Estimation in LLMs}
+
+Reliable deployment of LLMs in compliance requires the system to "know when it doesn't know."
+
+\subsection{Types of Uncertainty}
+Uncertainty in machine learning is typically categorized into two types:
+\begin{itemize}
+    \item \textbf{Aleatoric Uncertainty:} Inherent noise in the data itself (e.g., ambiguous phrasing in a meeting minute).
+    \item \textbf{Epistemic Uncertainty:} The model's lack of knowledge about a specific topic.
+\end{itemize}
+In the context of RAG, we are primarily concerned with epistemic uncertainty—detecting when the retrieved context is insufficient to answer the query.
+
+\subsection{Entropy-Based Monitoring}
+A practical proxy for uncertainty is \textbf{Shannon Entropy}. For a generated sequence of tokens, high entropy ($H(t)$) often correlates with low confidence or confusion.
+\begin{equation}
+    H(t) = -\sum_{w \in V} p(w) \log p(w)
+\end{equation}
+By monitoring the mean entropy of an answer, a system can establish a dynamic threshold (e.g., $H_{threshold} = 1.5$) to flag potentially unreliable responses. This thesis investigates whether this token-level metric can serve as a reliable gate for "abstention"—refusing to answer when confidence is low.
+
+\section{Automated Alignment: From RLHF to RLAIF}
+
+To mitigate hallucinations, LLMs are traditionally fine-tuned using Reinforcement Learning from Human Feedback (RLHF). However, RLHF is resource-intensive and difficult to scale for specialized domains like compliance.
+
+\subsection{Reinforcement Learning from AI Feedback (RLAIF)}
+Recent research proposes replacing the human annotator with a stronger "Teacher" model (e.g., GPT-4). This approach, known as RLAIF, allows for rapid, low-cost alignment.
+
+\subsection{Direct Preference Optimization (DPO)}
+A streamlined alternative to PPO (Proximal Policy Optimization), DPO (Direct Preference Optimization) optimizes the model directly on preference pairs (Winner vs. Loser) without needing a separate reward model. In this thesis, we utilize an offline DPO protocol where a Teacher model grades Student answers on strict criteria: factual grounding, citation accuracy, and refusal appropriateness. This allows the system to "learn" the specific constraints of the compliance domain without direct human intervention in the training loop.

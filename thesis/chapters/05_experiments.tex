@@ -1,0 +1,90 @@
+\chapter{Experimental Design}
+\label{ch:experiments}
+
+This chapter details the experimental framework designed to evaluate the "Self-Monitoring Compliance Assistant." The primary objective is to isolate the causal impact of the two proposed interventions: entropy-based uncertainty estimation and RLAIF-driven alignment. To achieve this, we employ a rigorous ablation study followed by an adversarial "Red Teaming" protocol.
+
+\section{Experimental Setup and Ablation Studies}
+
+To measure the marginal contribution of each system component, we compare five distinct system variants. This comparative approach allows us to determine whether improvements in reliability stem from the uncertainty gate, the preference training, or the combination of both.
+
+\subsection{System Variants}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|c|c|l|}
+        \hline
+        \textbf{Variant} & \textbf{Entropy Gate} & \textbf{DPO Training} & \textbf{Experimental Purpose} \\
+        \hline
+        Baseline & \ding{55} & \ding{55} & Establishing raw RAG performance (Llama-3-8B). \\
+        \hline
+        Entropy-Only & \ding{51} & \ding{55} & Isolating the utility of the uncertainty filter. \\
+        \hline
+        DPO-Only & \ding{55} & \ding{51} & Isolating the impact of preference learning. \\
+        \hline
+        \textbf{Full System} & \ding{51} & \ding{51} & \textbf{Evaluating the combined hypothesis.} \\
+        \hline
+        Oracle & N/A & N/A & Human-judged retrieval + feedback (Upper Bound). \\
+        \hline
+    \end{tabular}
+    \caption{Summary of Ablation Study Variants}
+    \label{tab:ablation_variants}
+\end{table}
+
+\subsection{Training Protocol: Offline DPO}
+The training process for the DPO variants follows a strict iterative cycle designed to minimize "Teacher error":
+\begin{enumerate}
+    \item \textbf{Synthetic Data Generation:} We generate 1,000 queries covering factual, interpretive, and counterfactual scenarios based on the FOMC corpus.
+    \item \textbf{Preference Labeling:} The Teacher model (GPT-4-Turbo) grades student answers. A "Win" is defined as an answer with $\ge 8/10$ grounding and zero hallucinations. A "Loss" is defined as any answer with $\le 5/10$ grounding or containing hallucinated content.
+    \item \textbf{Fine-Tuning:} The model is fine-tuned for 3 epochs (Learning Rate $5e-6$, $\beta=0.1$) on the collected preference pairs. To prevent overfitting, 20\% of data is held out for validation.
+\end{enumerate}
+
+\section{Evaluation Metrics}
+
+We employ a multi-level evaluation strategy combining automated metrics with human-verified sampling.
+
+\subsection{Primary Quantitative Metrics}
+\begin{itemize}
+    \item \textbf{Citation Precision:} The percentage of generated claims that are supported by a valid citation to a retrieved chunk. This is measured via automated string matching between the answer and the source text.
+    \item \textbf{Hallucination Rate:} The percentage of answers containing information not present in the retrieved chunks. This is estimated by the Teacher model and verified on a sample basis by human experts.
+    \item \textbf{Abstention Recall:} The system's ability to correctly refuse to answer. Measured on a curated test set of 50 "unanswerable" queries, calculating the percentage of times the system outputs the "Insufficient information" token.
+    \item \textbf{Entropy Calibration:} We calculate the Spearman's rank correlation ($\rho$) between the system's average entropy score and the Teacher-graded accuracy. A strong negative correlation indicates that entropy is a valid proxy for correctness.
+\end{itemize}
+
+\subsection{Secondary Metrics}
+In addition to reliability, we monitor system usability:
+\begin{itemize}
+    \item \textbf{Retrieval Quality (NDCG@5):} Normalized Discounted Cumulative Gain at rank 5, measuring the relevance of the retrieved chunks.
+    \item \textbf{Latency (P95):} The 95th percentile response time, specifically analyzing the cost overhead introduced by the entropy re-ranking loop.
+\end{itemize}
+
+\section{Red-Teaming Protocol: Adversarial Evaluation}
+
+To stress-test the system, we construct a "Red Team" dataset comprising 250 adversarial queries divided into five attack categories (50 examples each). This protocol is designed to force the entropy gate into failure modes.
+
+\subsection{Attack Categories}
+\begin{description}
+    \item[Category 1: Confident Hallucinations] \hfill \\
+    Queries designed to elicit plausible-sounding but false answers.
+    \textit{Example:} "What did the June 2024 FOMC statement say about cryptocurrency regulation?" (Note: The FOMC does not regulate crypto).
+    \textit{Hypothesis:} The baseline model will hallucinate a policy; the entropy gate should trigger a refusal.
+
+    \item[Category 2: Semantic Ambiguity] \hfill \\
+    Queries where the source text is genuinely vague.
+    \textit{Example:} "Was the Committee 'concerned' or 'very concerned' about inflation?"
+    \textit{Hypothesis:} High entropy scores should reflect the linguistic ambiguity.
+
+    \item[Category 3: Retrieval Poisoning] \hfill \\
+    We deliberately inject one irrelevant but topically related chunk into the top-5 context. We measure if the Student model cites the "poisoned" chunk.
+
+    \item[Category 4: Temporal Confusion] \hfill \\
+    Queries asking for "current" policy without specifying a date.
+    \textit{Hypothesis:} The model should request clarification rather than assuming the most recent document date.
+
+    \item[Category 5: Negation Traps] \hfill \\
+    Queries requiring careful attention to boolean logic (e.g., "except," "unless").
+    \textit{Example:} "Which members did NOT dissent in March 2024?"
+    \textit{Hypothesis:} Standard RAG systems often overlook negations; we test if RLAIF training improves sensitivity to these logical operators.
+\end{description}
+
+\section{Human Evaluation and Agreement}
+
+Recognizing that "Teacher" models are fallible, we establish a human baseline. A random sample of 10\% of Teacher grades ($n=200$) is reviewed by a human expert. We compute the inter-rater agreement (Cohen's Kappa) between the Teacher and Human. High disagreement scores will trigger a manual audit of the specific failure cases, allowing us to report a "Teacher Error Rate" as an explicit limitation of the study.

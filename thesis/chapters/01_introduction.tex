@@ -1,0 +1,52 @@
+\chapter{Introduction}
+\label{ch:introduction}
+
+\section{Research Motivation and Problem Context}
+
+Regulatory compliance professionals currently face a significant challenge of information overload when tracking evolving policy documents. While Retrieval-Augmented Generation (RAG) systems show promise for surfacing relevant information in these dense environments, their deployment in high-stakes domains is currently limited by two critical gaps:
+\begin{enumerate}
+    \item The inability of current systems to reliably signal when they lack sufficient information to answer a query.
+    \item The prohibitive cost of acquiring human feedback for iterative system improvement.
+\end{enumerate}
+
+This thesis investigates the intersection of these challenges. It proposes a controlled experimental framework to isolate and measure specific technical mechanisms—specifically entropy-based uncertainty estimation and Reinforcement Learning from AI Feedback (RLAIF)—that may contribute to safer, document-grounded generation.
+
+\section{Research Questions}
+
+The primary objective of this study is to determine whether combining intrinsic uncertainty measures with automated feedback mechanisms can create a foundation for more reliable document-grounded question answering. This investigation is guided by three specific research questions:
+
+\begin{description}
+    \item[RQ1:] Can token-level entropy serve as a useful (though imperfect) indicator of answer reliability in RAG systems?
+    \item[RQ2:] Can automated AI feedback (RLAIF) with strict grounding constraints improve citation accuracy and reduce hallucinations?
+    \item[RQ3:] What are the failure modes and limitations of this approach, and under what conditions does it break down?
+\end{description}
+
+\section{Scope and Limitations}
+
+\subsection{Explicit Non-Goals}
+It is crucial to define the boundaries of this research. This thesis does not claim to produce a production-ready compliance system. Success on the selected dataset is necessary but insufficient to claim success in legal compliance tasks. Instead, the goal is to establish a reproducible methodology for evaluating self-monitoring capabilities in RAG systems.
+
+\subsection{Dataset Selection}
+The empirical investigation relies on the \textbf{FOMC Meeting Minutes (2015-2024)}. This dataset was selected for several methodologically convenient properties:
+\begin{itemize}
+    \item \textbf{Public Availability:} It allows for reproducible research without confidentiality restrictions.
+    \item \textbf{Formal Register:} The dense, technical language requires careful interpretation, similar to binding legal code.
+    \item \textbf{Temporal Structure:} The sequential nature of the documents reflects evolving policy positions.
+\end{itemize}
+
+\section{Methodological Approach}
+
+To address the research questions, this study implements a "Self-Monitoring Compliance Assistant" architecture. The system utilizes a \textbf{Vector Database} retrieving 512-token segments and a \textbf{Generation Layer} based on Llama-3-8B-Instruct.
+
+The core innovation lies in the \textbf{Uncertainty Module}, which calculates Shannon entropy per generated token ($H(t) = -\sum p(w) \log p(w)$) to trigger expanded retrieval or refusal when the model is uncertain. Furthermore, the system employs an \textbf{Offline DPO (Direct Preference Optimization)} training protocol, utilizing a "Teacher" model (GPT-4-Turbo) to generate preference pairs based on strict grounding and citation accuracy criteria.
+
+\section{Thesis Structure}
+
+The remainder of this thesis is organized as follows:
+\begin{itemize}
+    \item \textbf{Chapter 2} reviews the background on RAG systems, uncertainty estimation in LLMs, and current approaches to automated alignment (RLAIF).
+    \item \textbf{Chapter 3} details the system architecture, including the hybrid visual-textual extraction pipeline used to process FOMC documents.
+    \item \textbf{Chapter 4} outlines the experimental design, including the ablation studies and red-teaming protocols.
+    \item \textbf{Chapter 5} presents the results, focusing on citation precision, hallucination rates, and entropy calibration.
+    \item \textbf{Chapter 6} discusses the failure modes, ethical considerations, and conclusions.
+\end{itemize}

@@ -7,3 +7,25 @@ output
 logs/.gitkeep 
 logs/*.log
 .env
+
+
+# latex build files
+thesis/main.aux
+thesis/main.bbl
+thesis/main.bcf
+thesis/main.blg
+thesis/main.fdb_latexmk
+thesis/main.fls
+thesis/main.lof
+thesis/main.log
+thesis/main.lot
+thesis/main.out
+thesis/main.run.xml
+thesis/main.synctex.gz
+thesis/main.toc
+thesis/main.pdf
+thesis/chapters/01_introduction.aux
+thesis/chapters/02_background.aux
+thesis/chapters/03_system_design.aux
+thesis/chapters/04_experiments.aux
+thesis/chapters/06_discussion.aux
