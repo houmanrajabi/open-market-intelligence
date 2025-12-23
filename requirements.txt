@@ -22,3 +22,8 @@ accelerate
 pandas
 
 openai
+
+tiktoken
+sentence_transformers
+
+chromadb
