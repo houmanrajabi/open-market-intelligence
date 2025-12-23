@@ -7,14 +7,14 @@ This chapter details the engineering specifications of the "Self-Monitoring Comp
 
 The system is architected as a modular pipeline consisting of three decoupled subsystems: the \textbf{Ingestion Subsystem}, the \textbf{Inference Subsystem}, and the \textbf{Alignment Subsystem}. This decoupling allows for independent scaling of the computationally expensive vision processing components from the latency-sensitive retrieval components.
 
-\begin{figure}[h]
-    \centering
-    % \includegraphics[width=\textwidth]{figures/system_architecture_diagram.png}
-    \caption{High-level system architecture showing the flow from Raw PDF to RLAIF-optimized Generation.}
-    \label{fig:system_arch}
-\end{figure}
+% \begin{figure}[h]
+%     \centering
+%     % \includegraphics[width=\textwidth]{figures/system_architecture_diagram.png}
+%     \caption{High-level system architecture showing the flow from Raw PDF to RLAIF-optimized Generation.}
+%     \label{fig:system_arch}
+% \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \resizebox{\textwidth}{!}{
         \input{figures/system_diagram.tex}
