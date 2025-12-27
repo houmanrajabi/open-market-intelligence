@@ -12,6 +12,7 @@ class ChunkType(Enum):
     TEXT = "text"
     TABLE = "table"
     FIGURE = "figure"
+    MULTIMODAL = "multimodal"
 
 
 class DocumentType(Enum):
@@ -29,15 +30,20 @@ class DocumentChunk:
     Represents a chunk of document content
 
     Attributes:
-        unique_id: Unique identifier for the chunk
+        unique_id: Unique identifier for the chunk (also accessible as chunk_id)
         content: The actual text/table/figure content
-        chunk_type: Type of chunk (text, table, figure)
+        chunk_type: Type of chunk (text, table, figure, multimodal)
         metadata: Additional metadata
     """
     unique_id: str
     content: str
     chunk_type: ChunkType
     metadata: Dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def chunk_id(self) -> str:
+        """Alias for unique_id for compatibility"""
+        return self.unique_id
 
     def __post_init__(self):
         """Convert chunk_type to enum if string"""

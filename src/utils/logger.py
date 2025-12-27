@@ -72,7 +72,7 @@ def get_logger(name: str = "fomc_rag") -> logging.Logger:
 
 # Initialize default logger only if config is available
 try:
-    from .config import config
+    from src.utils.config import config
     logger = setup_logger(
         name="fomc_rag",
         level=config.logging.level,
