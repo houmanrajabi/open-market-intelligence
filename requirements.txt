@@ -1,29 +1,45 @@
+# Core dependencies
 requests
 pydantic
 pydantic-settings
 beautifulsoup4
+pandas
+
+# PDF processing
 fpdf
 pymupdf
 pdfplumber
-
 pdf2image
 
+# VLM processing
 llmwhisperer.client
 
-
-transformers
-qwen-vl-utils
-
+# ML/AI frameworks
 torch
 torchvision
-
+transformers
 accelerate
+qwen-vl-utils
 
-pandas
-
+# LLM APIs
 openai
-
 tiktoken
-sentence_transformers
 
+# Embeddings and vector DB
+sentence_transformers
 chromadb
+
+# DPO/LoRA training
+datasets  # HuggingFace datasets for preference pairs
+trl  # Transformer Reinforcement Learning (includes DPOTrainer)
+peft  # Parameter-Efficient Fine-Tuning (LoRA)
+bitsandbytes  # 4-bit quantization
+
+# Evaluation and metrics
+numpy
+scikit-learn  # For metrics like ROC AUC, ECE
+scipy  # For statistical computations
+
+# Utilities
+tqdm  # Progress bars
+python-dotenv  # Environment variable loading
