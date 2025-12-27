@@ -474,6 +474,139 @@ def calculate_quality_score(element: dict) -> float:
     
     return max(0.0, min(1.0, base_score))
 
+# --- IMAGE DETECTION FALLBACK ---
+
+def detect_image_blocks_pymupdf(page: fitz.Page, pdf_w: float, pdf_h: float) -> List[dict]:
+    """
+    Fallback image detection using PyMuPDF.
+
+    Detects embedded images that VLM might have missed.
+
+    Args:
+        page: PyMuPDF page object
+        pdf_w: PDF page width
+        pdf_h: PDF page height
+
+    Returns:
+        List of image elements with normalized bboxes
+    """
+    image_elements = []
+
+    try:
+        # Get all images on the page
+        image_list = page.get_images(full=True)
+
+        if not image_list:
+            return []
+
+        logger.debug(f"PyMuPDF detected {len(image_list)} embedded images")
+
+        for img_index, img in enumerate(image_list):
+            xref = img[0]  # Image xref number
+
+            # Get image bounding box
+            try:
+                # Get all locations where this image appears
+                img_rects = page.get_image_rects(xref)
+
+                if not img_rects:
+                    continue
+
+                # Use first occurrence
+                bbox_pdf = img_rects[0]
+
+                # Convert to normalized coordinates [ymin, xmin, ymax, xmax] in 0-1000
+                bbox_norm = [
+                    int(bbox_pdf.y0 / pdf_h * 1000),
+                    int(bbox_pdf.x0 / pdf_w * 1000),
+                    int(bbox_pdf.y1 / pdf_h * 1000),
+                    int(bbox_pdf.x1 / pdf_w * 1000)
+                ]
+
+                # Calculate image area (percentage of page)
+                area = (bbox_norm[2] - bbox_norm[0]) * (bbox_norm[3] - bbox_norm[1])
+                area_pct = area / (1000 * 1000) * 100
+
+                # Skip very small images (likely logos, icons)
+                if area_pct < 1.0:  # Less than 1% of page
+                    logger.debug(f"Skipping small image ({area_pct:.1f}% of page)")
+                    continue
+
+                image_elements.append({
+                    "type": "FIGURE",
+                    "bbox": bbox_norm,
+                    "hint": f"Image {img_index + 1} (detected by PyMuPDF)",
+                    "source": "pymupdf_fallback",
+                    "confidence": 0.7,  # Lower confidence for fallback detection
+                    "metadata": {
+                        "xref": xref,
+                        "area_percentage": area_pct,
+                        "detection_method": "pymupdf_image_block"
+                    }
+                })
+
+                logger.debug(f"Added image: {area_pct:.1f}% of page at {bbox_norm}")
+
+            except Exception as e:
+                logger.warning(f"Failed to get bbox for image {img_index}: {e}")
+                continue
+
+        return image_elements
+
+    except Exception as e:
+        logger.error(f"PyMuPDF image detection failed: {e}")
+        return []
+
+
+def merge_layout_with_fallback_images(
+    layout_elements: List[dict],
+    fallback_images: List[dict],
+    overlap_threshold: float = 0.5
+) -> List[dict]:
+    """
+    Merge fallback-detected images into layout, avoiding duplicates.
+
+    Args:
+        layout_elements: Elements from VLM
+        fallback_images: Images detected by PyMuPDF
+        overlap_threshold: IoU threshold to consider as duplicate
+
+    Returns:
+        Merged element list
+    """
+    if not fallback_images:
+        return layout_elements
+
+    # Check if VLM already detected FIGUREs
+    existing_figures = [e for e in layout_elements if e.get("type") == "FIGURE"]
+
+    if not existing_figures:
+        # No figures detected by VLM, add all fallback images
+        logger.info(f"Adding {len(fallback_images)} PyMuPDF-detected images (VLM found none)")
+        return layout_elements + fallback_images
+
+    # Check for overlaps with existing figures
+    images_to_add = []
+    for img in fallback_images:
+        is_duplicate = False
+        for fig in existing_figures:
+            overlap = calculate_overlap(img["bbox"], fig["bbox"])
+            if overlap > overlap_threshold:
+                is_duplicate = True
+                logger.debug(f"Skipping duplicate image (IoU: {overlap:.2f})")
+                break
+
+        if not is_duplicate:
+            images_to_add.append(img)
+
+    if images_to_add:
+        logger.info(f"Adding {len(images_to_add)} additional PyMuPDF-detected images")
+        return layout_elements + images_to_add
+    else:
+        logger.debug("All PyMuPDF images already covered by VLM detection")
+        return layout_elements
+
+
 # --- MAIN EXTRACTION FUNCTION ---
 
 def extract_hybrid_content(
@@ -512,7 +645,14 @@ def extract_hybrid_content(
     
     # 2. Sort by intelligent reading order
     sorted_layout = sort_reading_order(layout_map.get("layout", []))
-    
+
+    # 3. Apply PyMuPDF image detection fallback
+    fallback_images = detect_image_blocks_pymupdf(page, pdf_w, pdf_h)
+    if fallback_images:
+        sorted_layout = merge_layout_with_fallback_images(sorted_layout, fallback_images)
+        # Re-sort after adding fallback images
+        sorted_layout = sort_reading_order(sorted_layout)
+
     logger.info(f"Processing {len(sorted_layout)} elements in reading order")
     
     # 3. Context management with reset logic

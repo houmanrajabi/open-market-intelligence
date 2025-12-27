@@ -30,17 +30,26 @@ LAYOUT_PROMPT = """You are a Document Structure Layout Engine for financial and 
    - Section titles, table captions, chart titles
    - Bold/larger text that introduces a block
    - Example: "Table 1: Economic Projections" → HEADER
-   
-2. **TABLE** 
+
+2. **TABLE**
    - Rows and columns with data
    - Include column headers, exclude title if it's distinct
-   
-3. **FIGURE**
-   - Charts, graphs, plots, diagrams
-   
+
+3. **FIGURE (HIGH PRIORITY - MUST DETECT)**
+   - **Any visual element that is NOT text or tables**
+   - Line charts, bar charts, box plots, scatter plots, pie charts
+   - Graphs showing trends over time or comparisons
+   - Diagrams, flowcharts, or illustrations
+   - Shaded regions, colored areas, or plot elements
+   - **IMPORTANT**: If you see axes (x/y), gridlines, data points, or trend lines → FIGURE
+   - **IMPORTANT**: If there's a visual representation of data → FIGURE
+   - Look carefully for: chart legends, axis labels, plot markers, colored bars/lines
+   - Figures often appear below headers like "Figure 1:", "Chart:", or numbered captions
+   - **Do NOT miss figures - they contain critical information**
+
 4. **FOOTER**
    - Page numbers, footnotes, "Confidential" markers
-   
+
 5. **TEXT**
    - Paragraphs, bullet points, explanatory text
 
@@ -52,12 +61,16 @@ If you detect multiple columns, add a "column" field (1, 2, etc.)
   "layout": [
     {"type": "HEADER", "bbox": [50, 50, 100, 950], "hint": "Table 1 Economic Projections"},
     {"type": "TABLE", "bbox": [110, 50, 400, 950], "column": 1},
-    {"type": "TEXT", "bbox": [110, 50, 400, 450], "column": 1},
-    {"type": "TEXT", "bbox": [110, 460, 400, 950], "column": 2}
+    {"type": "HEADER", "bbox": [410, 50, 460, 950], "hint": "Figure 1: GDP Growth"},
+    {"type": "FIGURE", "bbox": [470, 50, 800, 950], "hint": "Line chart showing GDP trends"},
+    {"type": "TEXT", "bbox": [810, 50, 950, 450], "column": 1},
+    {"type": "TEXT", "bbox": [810, 460, 950, 950], "column": 2}
   ]
 }
 
-Coordinates: [ymin, xmin, ymax, xmax] scaled 0-1000, origin top-left."""
+Coordinates: [ymin, xmin, ymax, xmax] scaled 0-1000, origin top-left.
+
+**REMINDER**: Always look for figures/charts - they are critical visual elements that must be detected!"""
 
 TABLE_PROMPT = """You are a Table Data Extractor. Extract this table as STRICTLY VALID CSV.
 
