@@ -4,6 +4,7 @@ venv/
 .python-version
 
 output
+processed
 logs/.gitkeep 
 logs/*.log
 .env
@@ -24,3 +25,16 @@ thesis/**/*.run.xml
 thesis/**/*.synctex.gz
 thesis/**/*.toc
 thesis/**/*.pdf
+data/alignment/
+data/evaluation/
+data/experiments/
+data/red_team_results/
+data/test_set/
+data/vector_db/
+
+data/processed_test/
+figures/test_pdffigures2.ipynb
+notebooks/surya_debug
+
+reports
+debug
