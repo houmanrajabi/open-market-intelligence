@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Improved Document Layout Analyzer
-Enhanced classification logic based on real-world Federal Reserve document analysis
+Final Improved Document Layout Analyzer
+Based on critical analysis of Federal Reserve document failures
+
+Key Improvements:
+1. Line Merging: Merge fragmented text lines into coherent blocks
+2. Alignment Scoring: Distinguish tables (high alignment) from charts (low alignment)
+3. No Density Cap: Charts can have any number of elements
+4. Proper Classification Order
 """
 
 import os
@@ -10,6 +16,7 @@ from typing import List, Dict, Tuple, Optional, Set
 from dataclasses import dataclass, field
 from enum import Enum
 from collections import defaultdict
+import numpy as np
 
 import fitz  # PyMuPDF
 from PIL import Image
@@ -41,7 +48,9 @@ class BBoxInfo:
     y2: float
     region_type: RegionType = RegionType.UNKNOWN
     confidence: float = 0.0
-    cluster_id: Optional[int] = None  # For grouping related bboxes
+    cluster_id: Optional[int] = None
+    is_merged: bool = False  # NEW: Track if this bbox was created by merging
+    merged_from: List[int] = field(default_factory=list)  # NEW: Original bbox indices
     
     @property
     def width(self) -> float:
@@ -77,22 +86,6 @@ class BBoxInfo:
             return self.y1 - other.y2
         return 0
     
-    def horizontal_gap_to(self, other: 'BBoxInfo') -> float:
-        """Horizontal gap between bboxes"""
-        if self.x2 < other.x1:
-            return other.x1 - self.x2
-        elif other.x2 < self.x1:
-            return self.x1 - other.x2
-        return 0
-    
-    def vertical_overlap(self, other: 'BBoxInfo') -> float:
-        """Calculate vertical overlap ratio (0-1)"""
-        overlap_start = max(self.y1, other.y1)
-        overlap_end = min(self.y2, other.y2)
-        overlap = max(0, overlap_end - overlap_start)
-        min_height = min(self.height, other.height)
-        return overlap / min_height if min_height > 0 else 0
-    
     def horizontal_overlap(self, other: 'BBoxInfo') -> float:
         """Calculate horizontal overlap ratio (0-1)"""
         overlap_start = max(self.x1, other.x1)
@@ -101,65 +94,69 @@ class BBoxInfo:
         min_width = min(self.width, other.width)
         return overlap / min_width if min_width > 0 else 0
     
-    def is_horizontally_aligned(self, other: 'BBoxInfo', tolerance: float = 20.0) -> bool:
-        """Check if bboxes are horizontally aligned (same y-position)"""
-        return abs(self.y1 - other.y1) < tolerance or abs(self.y2 - other.y2) < tolerance
-    
-    def is_vertically_aligned(self, other: 'BBoxInfo', tolerance: float = 20.0) -> bool:
-        """Check if bboxes are vertically aligned (same x-position)"""
-        return abs(self.x1 - other.x1) < tolerance or abs(self.x2 - other.x2) < tolerance
+    def vertical_overlap(self, other: 'BBoxInfo') -> float:
+        """Calculate vertical overlap ratio (0-1)"""
+        overlap_start = max(self.y1, other.y1)
+        overlap_end = min(self.y2, other.y2)
+        overlap = max(0, overlap_end - overlap_start)
+        min_height = min(self.height, other.height)
+        return overlap / min_height if min_height > 0 else 0
 
 
 @dataclass
 class ClassificationRules:
-    """Enhanced classification rules based on Federal Reserve document analysis"""
+    """Improved classification rules based on analysis"""
     
-    # Text detection - more conservative
-    text_min_aspect_ratio: float = 3.0  # Increased from 2.0 - text lines are wider
-    text_max_height_ratio: float = 0.04  # Decreased from 0.05 - text is usually small
-    text_min_width_ratio: float = 0.15  # New: text should span reasonable width
-    text_vertical_gap_threshold: float = 20.0  # Decreased for tighter grouping
+    # Line merging parameters - NEW!
+    merge_vertical_gap_multiplier: float = 1.5  # Max gap = line_height * multiplier
+    merge_horizontal_overlap_threshold: float = 0.3  # Min overlap to merge
+    merge_height_similarity_threshold: float = 0.5  # Max height difference ratio
     
-    # Title detection - new
-    title_min_font_size_ratio: float = 1.3  # Relative to average text height
-    title_center_threshold: float = 0.3  # Center alignment tolerance (0-0.5)
-    title_top_margin_ratio: float = 0.2  # Titles are usually in top 20%
+    # Alignment scoring - NEW!
+    alignment_tolerance: float = 5.0  # Pixels tolerance for alignment
+    alignment_min_matches: int = 2  # Min matches to count as aligned
     
-    # Caption detection - new
-    caption_max_height_ratio: float = 0.025  # Smaller than regular text
-    caption_near_figure_distance: float = 50.0  # Distance to figure/chart
+    # Table detection
+    table_alignment_score_threshold: float = 0.7  # 70% of boxes must be aligned
+    table_min_bboxes: int = 9
+    table_min_rows: int = 3
+    table_min_cols: int = 2
+    table_max_area_ratio: float = 0.8
     
-    # Figure detection - more strict
-    figure_min_area_ratio: float = 0.08  # Decreased - figures can be smaller
-    figure_max_density: float = 0.3  # New: figures have few internal bboxes
-    figure_isolation_threshold: float = 50.0  # Must be isolated from other regions
+    # Chart detection - REMOVED density max!
+    chart_min_area_ratio: float = 0.08
+    chart_bbox_density_min: int = 5
+    chart_alignment_score_max: float = 0.4  # Charts have LOW alignment
     
-    # Chart detection - completely new approach
-    chart_min_area_ratio: float = 0.1  # Charts are substantial
-    chart_bbox_density_min: int = 5  # Charts have multiple internal elements
-    chart_bbox_density_max: int = 100  # But not too many (that's a table)
-    chart_has_axes_pattern: bool = True  # Look for axis-like arrangements
+    # Text detection
+    text_min_aspect_ratio: float = 2.5
+    text_max_height_ratio: float = 0.05
+    text_min_width_ratio: float = 0.15
     
-    # Table detection - much more conservative
-    table_min_bboxes: int = 9  # Increased from 4 - tables have many cells
-    table_min_rows: int = 3  # New: must have multiple rows
-    table_min_cols: int = 2  # New: must have multiple columns
-    table_alignment_threshold: float = 15.0  # Stricter alignment
-    table_max_area_ratio: float = 0.7  # New: tables don't cover entire page
-    table_regularity_threshold: float = 0.6  # New: require grid regularity
+    # Title detection
+    title_min_font_size_ratio: float = 1.3
+    title_center_threshold: float = 0.3
+    title_top_margin_ratio: float = 0.2
+    
+    # Caption detection
+    caption_max_height_ratio: float = 0.025
+    caption_near_figure_distance: float = 60.0
+    
+    # Figure detection
+    figure_min_area_ratio: float = 0.08
+    figure_max_internal_bboxes: int = 3  # Figures are mostly isolated
     
     # Header/Footer detection
-    header_y_threshold: float = 0.08  # Stricter - top 8% only
-    footer_y_threshold: float = 0.92  # Stricter - bottom 8% only
+    header_y_threshold: float = 0.08
+    footer_y_threshold: float = 0.92
     
-    # Clustering parameters - new
-    cluster_distance_threshold: float = 100.0  # Group nearby bboxes
-    cluster_min_density: int = 3  # Minimum bboxes for a dense cluster
+    # Clustering
+    cluster_distance_threshold: float = 100.0
 
 
 @dataclass
 class BBoxCluster:
-    """Represents a group of related bboxes"""
+    """Represents a group of related bboxes with alignment analysis"""
     bboxes: List[BBoxInfo]
     cluster_id: int
     
@@ -193,38 +190,91 @@ class BBoxCluster:
             return 0
         return sum(b.area for b in self.bboxes) / len(self.bboxes)
     
-    def has_grid_pattern(self, tolerance: float = 20.0) -> Tuple[bool, int, int]:
+    def calculate_alignment_score(self, tolerance: float = 5.0, min_matches: int = 2) -> Tuple[float, float, float]:
         """
-        Check if cluster has grid-like arrangement.
-        Returns (has_grid, num_rows, num_cols)
+        Calculate alignment score for the cluster.
+        
+        Returns:
+            (x_alignment_score, y_alignment_score, combined_score)
+            Each score is between 0.0 (chaotic) and 1.0 (perfectly aligned)
+        """
+        if len(self.bboxes) < 3:
+            return (0.0, 0.0, 0.0)
+        
+        # X-alignment (vertical alignment - same left/right edges)
+        x_aligned_count = 0
+        for bbox in self.bboxes:
+            # Count how many other boxes share similar x-coordinates
+            left_matches = sum(
+                1 for other in self.bboxes 
+                if other != bbox and abs(bbox.x1 - other.x1) < tolerance
+            )
+            right_matches = sum(
+                1 for other in self.bboxes
+                if other != bbox and abs(bbox.x2 - other.x2) < tolerance
+            )
+            
+            if left_matches >= min_matches or right_matches >= min_matches:
+                x_aligned_count += 1
+        
+        x_alignment_score = x_aligned_count / len(self.bboxes)
+        
+        # Y-alignment (horizontal alignment - same top/bottom edges)
+        y_aligned_count = 0
+        for bbox in self.bboxes:
+            top_matches = sum(
+                1 for other in self.bboxes
+                if other != bbox and abs(bbox.y1 - other.y1) < tolerance
+            )
+            bottom_matches = sum(
+                1 for other in self.bboxes
+                if other != bbox and abs(bbox.y2 - other.y2) < tolerance
+            )
+            
+            if top_matches >= min_matches or bottom_matches >= min_matches:
+                y_aligned_count += 1
+        
+        y_alignment_score = y_aligned_count / len(self.bboxes)
+        
+        # Combined score (both alignments matter for tables)
+        combined_score = (x_alignment_score + y_alignment_score) / 2
+        
+        return (x_alignment_score, y_alignment_score, combined_score)
+    
+    def has_grid_structure(self, tolerance: float = 5.0) -> Tuple[bool, int, int]:
+        """
+        Check if cluster has grid structure using fuzzy alignment.
+        
+        Returns:
+            (has_grid, num_rows, num_cols)
         """
         if len(self.bboxes) < 4:
             return (False, 0, 0)
         
-        # Group by y-coordinate (rows)
-        y_groups = defaultdict(list)
+        # Fuzzy grouping by y-coordinate (rows)
+        y_groups = []
         for bbox in self.bboxes:
-            # Find existing group within tolerance
+            # Find existing group
             matched = False
-            for y_key in list(y_groups.keys()):
-                if abs(bbox.y1 - y_key) < tolerance:
-                    y_groups[y_key].append(bbox)
+            for group in y_groups:
+                if abs(bbox.y1 - group[0]) < tolerance:
+                    group.append(bbox.y1)
                     matched = True
                     break
             if not matched:
-                y_groups[bbox.y1].append(bbox)
+                y_groups.append([bbox.y1])
         
-        # Group by x-coordinate (columns)
-        x_groups = defaultdict(list)
+        # Fuzzy grouping by x-coordinate (columns)
+        x_groups = []
         for bbox in self.bboxes:
             matched = False
-            for x_key in list(x_groups.keys()):
-                if abs(bbox.x1 - x_key) < tolerance:
-                    x_groups[x_key].append(bbox)
+            for group in x_groups:
+                if abs(bbox.x1 - group[0]) < tolerance:
+                    group.append(bbox.x1)
                     matched = True
                     break
             if not matched:
-                x_groups[bbox.x1].append(bbox)
+                x_groups.append([bbox.x1])
         
         num_rows = len(y_groups)
         num_cols = len(x_groups)
@@ -232,10 +282,10 @@ class BBoxCluster:
         # Check if it's a reasonable grid
         expected_cells = num_rows * num_cols
         actual_cells = len(self.bboxes)
-        
-        # Grid should have most cells filled (allow some missing)
         regularity = actual_cells / expected_cells if expected_cells > 0 else 0
-        has_grid = regularity > 0.5 and num_rows >= 2 and num_cols >= 2
+        
+        # More lenient - 40% filled is enough for a grid
+        has_grid = regularity > 0.4 and num_rows >= 2 and num_cols >= 2
         
         return (has_grid, num_rows, num_cols)
 
@@ -247,6 +297,7 @@ class PageAnalysis:
     page_width: float
     page_height: float
     bboxes: List[BBoxInfo] = field(default_factory=list)
+    original_bboxes: List[BBoxInfo] = field(default_factory=list)  # NEW: Before merging
     clusters: List[BBoxCluster] = field(default_factory=list)
     
     @property
@@ -265,20 +316,19 @@ class PageAnalysis:
         return summary
 
 
-class ImprovedDocumentLayoutAnalyzer:
+class ImprovedAnalyzer:
     """
-    Improved document layout analyzer with enhanced classification logic.
+    Final improved document layout analyzer addressing all critical issues.
     
-    Key improvements:
-    - Multi-pass classification with context awareness
-    - Clustering to identify complex regions (charts, tables)
-    - Better distinction between tables and charts
-    - Title and caption detection
-    - More conservative table detection
+    Key Features:
+    1. Line Merging: Merges fragmented text lines into blocks
+    2. Alignment Scoring: Distinguishes tables (aligned) from charts (chaotic)
+    3. No Density Caps: Charts can have unlimited elements
+    4. Proper multi-pass classification
     """
     
     def __init__(self, rules: Optional[ClassificationRules] = None):
-        """Initialize the analyzer with improved rules."""
+        """Initialize the analyzer."""
         print("Loading Surya detection models...")
         self.predictor = DetectionPredictor()
         self.rules = rules or ClassificationRules()
@@ -305,8 +355,7 @@ class ImprovedDocumentLayoutAnalyzer:
         return results
     
     def analyze_page(self, pdf_path: str, page_num: int) -> PageAnalysis:
-        """Analyze a single PDF page with improved classification."""
-        # Convert page to image
+        """Analyze a single PDF page."""
         img = self._pdf_page_to_image(pdf_path, page_num)
         
         # Detect bboxes
@@ -324,10 +373,15 @@ class ImprovedDocumentLayoutAnalyzer:
         for bbox in result.bboxes:
             x1, y1, x2, y2 = bbox.bbox
             bbox_info = BBoxInfo(x1=x1, y1=y1, x2=x2, y2=y2)
-            analysis.bboxes.append(bbox_info)
+            analysis.original_bboxes.append(bbox_info)
+        
+        # CRITICAL: Merge lines FIRST (before any classification)
+        print(f"  Merging fragmented lines...")
+        self._merge_text_lines(analysis)
+        print(f"    {len(analysis.original_bboxes)} bboxes → {len(analysis.bboxes)} merged bboxes")
         
         # Multi-pass classification
-        self._classify_regions_improved(analysis)
+        self._classify_regions_final(analysis)
         
         return analysis
     
@@ -345,51 +399,150 @@ class ImprovedDocumentLayoutAnalyzer:
         for bbox in result.bboxes:
             x1, y1, x2, y2 = bbox.bbox
             bbox_info = BBoxInfo(x1=x1, y1=y1, x2=x2, y2=y2)
-            analysis.bboxes.append(bbox_info)
+            analysis.original_bboxes.append(bbox_info)
         
-        self._classify_regions_improved(analysis)
+        self._merge_text_lines(analysis)
+        self._classify_regions_final(analysis)
         
         return analysis
     
-    def _classify_regions_improved(self, analysis: PageAnalysis) -> None:
+    def _merge_text_lines(self, analysis: PageAnalysis) -> None:
         """
-        Improved multi-pass classification strategy.
+        Merge fragmented text lines into coherent blocks.
         
-        Classification order:
-        1. Cluster bboxes into groups
-        2. Identify headers/footers (positional)
-        3. Identify charts (cluster analysis)
-        4. Identify tables (grid pattern + cluster analysis)
-        5. Identify figures (large isolated regions)
-        6. Identify titles (large, centered text)
-        7. Identify captions (small text near figures/charts)
-        8. Identify regular text (everything else with text characteristics)
+        Algorithm:
+        1. Sort bboxes by y-coordinate
+        2. For each bbox, check if it should merge with previous
+        3. Merge if: close vertically, overlap horizontally, similar height
+        """
+        if not analysis.original_bboxes:
+            return
+        
+        # Sort by vertical position
+        sorted_bboxes = sorted(analysis.original_bboxes, key=lambda b: (b.y1, b.x1))
+        
+        # Track which bboxes have been merged
+        merged_indices = set()
+        merged_bboxes = []
+        
+        i = 0
+        while i < len(sorted_bboxes):
+            if i in merged_indices:
+                i += 1
+                continue
+            
+            current = sorted_bboxes[i]
+            current_group = [current]
+            current_indices = [i]
+            
+            # Look ahead to find mergeable bboxes
+            j = i + 1
+            while j < len(sorted_bboxes):
+                if j in merged_indices:
+                    j += 1
+                    continue
+                
+                candidate = sorted_bboxes[j]
+                
+                # Check if candidate should merge with current group
+                # Use the last bbox in group for comparison
+                last_in_group = current_group[-1]
+                
+                # 1. Check vertical gap
+                v_gap = candidate.y1 - last_in_group.y2
+                avg_height = (last_in_group.height + candidate.height) / 2
+                max_gap = avg_height * self.rules.merge_vertical_gap_multiplier
+                
+                if v_gap > max_gap:
+                    # Too far vertically, stop looking
+                    break
+                
+                # 2. Check horizontal overlap
+                h_overlap = last_in_group.horizontal_overlap(candidate)
+                
+                if h_overlap < self.rules.merge_horizontal_overlap_threshold:
+                    # No horizontal overlap, check next
+                    j += 1
+                    continue
+                
+                # 3. Check height similarity
+                height_ratio = min(last_in_group.height, candidate.height) / max(last_in_group.height, candidate.height)
+                
+                if height_ratio < self.rules.merge_height_similarity_threshold:
+                    # Different font sizes, skip
+                    j += 1
+                    continue
+                
+                # All checks passed - merge!
+                current_group.append(candidate)
+                current_indices.append(j)
+                merged_indices.add(j)
+                
+                j += 1
+            
+            # Create merged bbox
+            if len(current_group) == 1:
+                # No merging happened
+                merged_bboxes.append(current)
+            else:
+                # Merge into single bbox
+                x1 = min(b.x1 for b in current_group)
+                y1 = min(b.y1 for b in current_group)
+                x2 = max(b.x2 for b in current_group)
+                y2 = max(b.y2 for b in current_group)
+                
+                merged = BBoxInfo(
+                    x1=x1, y1=y1, x2=x2, y2=y2,
+                    is_merged=True,
+                    merged_from=current_indices
+                )
+                merged_bboxes.append(merged)
+            
+            merged_indices.add(i)
+            i += 1
+        
+        # Update analysis with merged bboxes
+        analysis.bboxes = merged_bboxes
+    
+    def _classify_regions_final(self, analysis: PageAnalysis) -> None:
+        """
+        Final multi-pass classification with improved logic.
+        
+        Order:
+        1. Cluster bboxes
+        2. Headers/Footers (positional)
+        3. Charts (LOW alignment + high density)
+        4. Tables (HIGH alignment + grid structure)
+        5. Figures (large isolated regions)
+        6. Titles (large centered text)
+        7. Captions (small text near figures/charts)
+        8. Text (merged lines with text characteristics)
         """
         if not analysis.bboxes:
             return
         
-        # Step 1: Cluster bboxes
+        # Step 1: Cluster
         self._cluster_bboxes(analysis)
         
-        # Step 2: Headers and footers (easy, positional)
+        # Step 2: Headers/Footers
         self._classify_headers_footers(analysis)
         
-        # Step 3: Charts (before tables, to avoid misclassification)
-        self._classify_charts(analysis)
+        # Step 3: Charts (BEFORE tables!)
+        self._classify_charts_final(analysis)
         
-        # Step 4: Tables (conservative, grid-based)
-        self._classify_tables(analysis)
+        # Step 4: Tables
+        self._classify_tables_final(analysis)
         
-        # Step 5: Figures (isolated large regions)
+        # Step 5: Figures
         self._classify_figures(analysis)
         
-        # Step 6: Titles (large centered text)
+        # Step 6: Titles
         self._classify_titles(analysis)
         
-        # Step 7: Captions (small text near figures/charts)
+        # Step 7: Captions
         self._classify_captions(analysis)
         
-        # Step 8: Regular text (remaining bboxes with text characteristics)
+        # Step 8: Text
         self._classify_text(analysis)
     
     def _cluster_bboxes(self, analysis: PageAnalysis) -> None:
@@ -397,23 +550,20 @@ class ImprovedDocumentLayoutAnalyzer:
         if not analysis.bboxes:
             return
         
-        # Simple clustering: group bboxes within threshold distance
         unassigned = set(range(len(analysis.bboxes)))
         cluster_id = 0
         
         while unassigned:
-            # Start new cluster with first unassigned bbox
             seed_idx = min(unassigned)
             cluster_indices = {seed_idx}
             unassigned.remove(seed_idx)
             
-            # Grow cluster by adding nearby bboxes
+            # Grow cluster
             changed = True
             while changed:
                 changed = False
                 for idx in list(unassigned):
                     bbox = analysis.bboxes[idx]
-                    # Check if close to any bbox in current cluster
                     for cluster_idx in cluster_indices:
                         cluster_bbox = analysis.bboxes[cluster_idx]
                         if bbox.distance_to(cluster_bbox) < self.rules.cluster_distance_threshold:
@@ -446,18 +596,18 @@ class ImprovedDocumentLayoutAnalyzer:
                 bbox.region_type = RegionType.FOOTER
                 bbox.confidence = 0.9
     
-    def _classify_charts(self, analysis: PageAnalysis) -> None:
+    def _classify_charts_final(self, analysis: PageAnalysis) -> None:
         """
-        Classify charts based on cluster analysis.
+        Classify charts using alignment score.
+        
         Charts have:
-        - Moderate number of internal bboxes (not too few, not too many)
+        - LOW alignment score (< 0.4) - elements are not grid-aligned
+        - High density OR moderate density
         - Substantial area
-        - May have axis-like patterns
         """
         for cluster in analysis.clusters:
-            # Skip if too few or too many bboxes
-            if not (self.rules.chart_bbox_density_min <= len(cluster.bboxes) <= 
-                    self.rules.chart_bbox_density_max):
+            # Must have enough elements
+            if len(cluster.bboxes) < self.rules.chart_bbox_density_min:
                 continue
             
             # Check area
@@ -465,30 +615,32 @@ class ImprovedDocumentLayoutAnalyzer:
             if rel_area < self.rules.chart_min_area_ratio:
                 continue
             
-            # Check for grid pattern (charts often have regular spacing)
-            has_grid, rows, cols = cluster.has_grid_pattern(tolerance=30.0)
-            
-            # Charts might have some grid-like structure but not perfect
-            # (unlike tables which are very regular)
-            has_chart_pattern = (
-                (has_grid and rows <= 15 and cols <= 15) or  # Some structure but not dense
-                (not has_grid and len(cluster.bboxes) >= 8)  # Or irregular with enough elements
+            # CRITICAL: Calculate alignment score
+            x_align, y_align, combined_align = cluster.calculate_alignment_score(
+                tolerance=self.rules.alignment_tolerance,
+                min_matches=self.rules.alignment_min_matches
             )
             
-            if has_chart_pattern:
+            # Charts have LOW alignment (scatter plots, dot plots, etc.)
+            if combined_align < self.rules.chart_alignment_score_max:
+                # This is a chart!
                 for bbox in cluster.bboxes:
                     if bbox.region_type == RegionType.UNKNOWN:
                         bbox.region_type = RegionType.CHART
-                        bbox.confidence = 0.75
+                        bbox.confidence = 0.80
+                
+                print(f"    Detected CHART (cluster {cluster.cluster_id}): "
+                      f"{len(cluster.bboxes)} elements, "
+                      f"alignment={combined_align:.2f}")
     
-    def _classify_tables(self, analysis: PageAnalysis) -> None:
+    def _classify_tables_final(self, analysis: PageAnalysis) -> None:
         """
-        Conservative table classification based on strict grid patterns.
-        Tables must have:
-        - Clear grid structure with rows and columns
-        - Multiple cells (minimum threshold)
-        - Regular spacing
-        - Not covering entire page
+        Classify tables using alignment score and grid structure.
+        
+        Tables have:
+        - HIGH alignment score (> 0.7) - elements are grid-aligned
+        - Grid structure with rows and columns
+        - Multiple elements
         """
         for cluster in analysis.clusters:
             # Must have enough bboxes
@@ -500,9 +652,19 @@ class ImprovedDocumentLayoutAnalyzer:
             if rel_area > self.rules.table_max_area_ratio:
                 continue
             
-            # Must have clear grid pattern
-            has_grid, rows, cols = cluster.has_grid_pattern(
-                tolerance=self.rules.table_alignment_threshold
+            # CRITICAL: Calculate alignment score
+            x_align, y_align, combined_align = cluster.calculate_alignment_score(
+                tolerance=self.rules.alignment_tolerance,
+                min_matches=self.rules.alignment_min_matches
+            )
+            
+            # Tables have HIGH alignment
+            if combined_align < self.rules.table_alignment_score_threshold:
+                continue
+            
+            # Check grid structure
+            has_grid, rows, cols = cluster.has_grid_structure(
+                tolerance=self.rules.alignment_tolerance
             )
             
             if not has_grid:
@@ -512,54 +674,41 @@ class ImprovedDocumentLayoutAnalyzer:
             if rows < self.rules.table_min_rows or cols < self.rules.table_min_cols:
                 continue
             
-            # Check regularity
-            expected_cells = rows * cols
-            actual_cells = len(cluster.bboxes)
-            regularity = actual_cells / expected_cells
-            
-            if regularity < self.rules.table_regularity_threshold:
-                continue
-            
             # This is a table!
             for bbox in cluster.bboxes:
                 if bbox.region_type == RegionType.UNKNOWN:
                     bbox.region_type = RegionType.TABLE
                     bbox.confidence = 0.85
+            
+            print(f"    Detected TABLE (cluster {cluster.cluster_id}): "
+                  f"{rows}x{cols} grid, "
+                  f"alignment={combined_align:.2f}")
     
     def _classify_figures(self, analysis: PageAnalysis) -> None:
-        """
-        Classify figures as large, isolated regions.
-        Figures are typically:
-        - Large area
-        - Single bbox or very few bboxes
-        - Isolated from other regions
-        """
+        """Classify figures as large, isolated regions."""
         for bbox in analysis.bboxes:
             if bbox.region_type != RegionType.UNKNOWN:
                 continue
             
             rel_area = bbox.area / analysis.page_area
             
-            # Must be substantial size
             if rel_area < self.rules.figure_min_area_ratio:
                 continue
             
-            # Check isolation - count nearby bboxes
+            # Check isolation
             nearby_count = sum(
                 1 for other in analysis.bboxes
-                if other != bbox and bbox.distance_to(other) < self.rules.figure_isolation_threshold
+                if other != bbox and 
+                other.region_type == RegionType.UNKNOWN and
+                bbox.distance_to(other) < 100
             )
             
-            # Figures should be relatively isolated
-            if nearby_count < 5:  # Very few neighbors
+            if nearby_count < self.rules.figure_max_internal_bboxes:
                 bbox.region_type = RegionType.FIGURE
-                bbox.confidence = 0.7
+                bbox.confidence = 0.75
     
     def _classify_titles(self, analysis: PageAnalysis) -> None:
-        """
-        Classify titles as large, centered text near top of page.
-        """
-        # Calculate average text height for comparison
+        """Classify titles as large, centered text near top."""
         text_heights = [
             bbox.height for bbox in analysis.bboxes
             if bbox.region_type == RegionType.UNKNOWN
@@ -574,29 +723,23 @@ class ImprovedDocumentLayoutAnalyzer:
             if bbox.region_type != RegionType.UNKNOWN:
                 continue
             
-            # Must be larger than average
             if bbox.height < avg_height * self.rules.title_min_font_size_ratio:
                 continue
             
-            # Must be near top
             rel_y = bbox.y1 / analysis.page_height
             if rel_y > self.rules.title_top_margin_ratio:
                 continue
             
-            # Check if centered (x-position near page center)
             center_x = bbox.center[0]
             page_center_x = analysis.page_width / 2
             rel_offset = abs(center_x - page_center_x) / analysis.page_width
             
             if rel_offset < self.rules.title_center_threshold:
                 bbox.region_type = RegionType.TITLE
-                bbox.confidence = 0.8
+                bbox.confidence = 0.80
     
     def _classify_captions(self, analysis: PageAnalysis) -> None:
-        """
-        Classify captions as small text near figures or charts.
-        """
-        # Get figures and charts
+        """Classify captions as small text near figures or charts."""
         figures_and_charts = [
             bbox for bbox in analysis.bboxes
             if bbox.region_type in [RegionType.FIGURE, RegionType.CHART]
@@ -609,36 +752,29 @@ class ImprovedDocumentLayoutAnalyzer:
             if bbox.region_type != RegionType.UNKNOWN:
                 continue
             
-            # Must be small
             rel_height = bbox.height / analysis.page_height
             if rel_height > self.rules.caption_max_height_ratio:
                 continue
             
-            # Must be text-like (high aspect ratio)
             if bbox.aspect_ratio < 2.0:
                 continue
             
-            # Must be near a figure or chart
             for fig_chart in figures_and_charts:
                 distance = bbox.distance_to(fig_chart)
                 if distance < self.rules.caption_near_figure_distance:
                     bbox.region_type = RegionType.CAPTION
-                    bbox.confidence = 0.7
+                    bbox.confidence = 0.70
                     break
     
     def _classify_text(self, analysis: PageAnalysis) -> None:
-        """
-        Classify remaining bboxes as text if they have text characteristics.
-        """
+        """Classify remaining bboxes as text if they have text characteristics."""
         for bbox in analysis.bboxes:
             if bbox.region_type != RegionType.UNKNOWN:
                 continue
             
-            # Text characteristics
             rel_height = bbox.height / analysis.page_height
             rel_width = bbox.width / analysis.page_width
             
-            # Text lines: wide, short, reasonable size
             is_text = (
                 bbox.aspect_ratio > self.rules.text_min_aspect_ratio and
                 rel_height < self.rules.text_max_height_ratio and
@@ -647,7 +783,7 @@ class ImprovedDocumentLayoutAnalyzer:
             
             if is_text:
                 bbox.region_type = RegionType.TEXT
-                bbox.confidence = 0.65
+                bbox.confidence = 0.70
     
     def _pdf_page_to_image(self, pdf_path: str, page_num: int, dpi: int = 144) -> Image.Image:
         """Convert PDF page to PIL Image."""
@@ -667,7 +803,7 @@ class ImprovedDocumentLayoutAnalyzer:
         pdf_path: Optional[str] = None,
         output_path: Optional[str] = None,
         show: bool = True,
-        show_clusters: bool = False
+        show_original: bool = False
     ) -> None:
         """Visualize detected and classified regions."""
         if image is None:
@@ -690,28 +826,33 @@ class ImprovedDocumentLayoutAnalyzer:
         fig, ax = plt.subplots(1, 1, figsize=(15, 20))
         ax.imshow(image)
         
-        # Draw cluster boundaries if requested
-        if show_clusters:
-            for cluster in analysis.clusters:
-                x1, y1, x2, y2 = cluster.bounding_box
+        # Optionally show original (pre-merge) bboxes
+        if show_original and analysis.original_bboxes:
+            for bbox in analysis.original_bboxes:
                 rect = patches.Rectangle(
-                    (x1, y1), x2 - x1, y2 - y1,
-                    linewidth=1,
-                    edgecolor='yellow',
+                    (bbox.x1, bbox.y1), 
+                    bbox.width, 
+                    bbox.height,
+                    linewidth=0.5,
+                    edgecolor='lightgray',
                     facecolor='none',
                     linestyle='--',
                     alpha=0.3
                 )
                 ax.add_patch(rect)
         
-        # Draw bboxes
+        # Draw classified bboxes
         for bbox in analysis.bboxes:
             color = color_map[bbox.region_type]
+            
+            # Thicker border for merged bboxes
+            linewidth = 3 if bbox.is_merged else 2
+            
             rect = patches.Rectangle(
                 (bbox.x1, bbox.y1), 
                 bbox.width, 
                 bbox.height,
-                linewidth=2,
+                linewidth=linewidth,
                 edgecolor=color,
                 facecolor='none',
                 alpha=0.7
@@ -722,6 +863,8 @@ class ImprovedDocumentLayoutAnalyzer:
             label = f"{bbox.region_type.value}"
             if bbox.confidence > 0:
                 label += f" ({bbox.confidence:.2f})"
+            if bbox.is_merged:
+                label += f" [merged from {len(bbox.merged_from)}]"
             
             ax.text(
                 bbox.x1, bbox.y1 - 5,
@@ -735,6 +878,7 @@ class ImprovedDocumentLayoutAnalyzer:
         summary = analysis.summary()
         title = f"Page {analysis.page_num + 1} - "
         title += ", ".join([f"{k}: {v}" for k, v in summary.items() if v > 0])
+        title += f"\n[{len(analysis.original_bboxes)} original → {len(analysis.bboxes)} after merge]"
         ax.set_title(title, fontsize=14, pad=20)
         ax.axis('off')
         
@@ -754,7 +898,9 @@ class ImprovedDocumentLayoutAnalyzer:
         print(f"Page {analysis.page_num + 1} Analysis")
         print(f"{'='*70}")
         print(f"Page dimensions: {analysis.page_width:.0f} x {analysis.page_height:.0f} px")
-        print(f"Total regions detected: {len(analysis.bboxes)}")
+        print(f"Original bboxes: {len(analysis.original_bboxes)}")
+        print(f"After merging: {len(analysis.bboxes)}")
+        print(f"Merge ratio: {len(analysis.bboxes)/len(analysis.original_bboxes)*100:.1f}%")
         print(f"Number of clusters: {len(analysis.clusters)}")
         
         print(f"\nRegion Summary:")
@@ -766,26 +912,23 @@ class ImprovedDocumentLayoutAnalyzer:
         if verbose:
             print(f"\nCluster Analysis:")
             for cluster in analysis.clusters:
-                has_grid, rows, cols = cluster.has_grid_pattern()
-                print(f"  Cluster {cluster.cluster_id}:")
+                x_align, y_align, combined = cluster.calculate_alignment_score(
+                    self.rules.alignment_tolerance,
+                    self.rules.alignment_min_matches
+                )
+                has_grid, rows, cols = cluster.has_grid_structure(
+                    self.rules.alignment_tolerance
+                )
+                
+                print(f"\n  Cluster {cluster.cluster_id}:")
                 print(f"    Bboxes: {len(cluster.bboxes)}")
-                print(f"    Area: {cluster.area:.0f} px²")
-                print(f"    Density: {cluster.density:.6f}")
-                print(f"    Grid pattern: {has_grid} ({rows}x{cols})")
-            
-            print(f"\nDetailed Regions:")
-            for i, bbox in enumerate(analysis.bboxes, 1):
-                print(f"\n  Region {i}: {bbox.region_type.value.upper()}")
-                print(f"    Position: [{bbox.x1:.1f}, {bbox.y1:.1f}, {bbox.x2:.1f}, {bbox.y2:.1f}]")
-                print(f"    Size: {bbox.width:.1f} x {bbox.height:.1f} px")
-                print(f"    Aspect ratio: {bbox.aspect_ratio:.2f}")
-                print(f"    Confidence: {bbox.confidence:.2f}")
-                print(f"    Cluster: {bbox.cluster_id}")
+                print(f"    Alignment: X={x_align:.2f}, Y={y_align:.2f}, Combined={combined:.2f}")
+                print(f"    Grid: {has_grid} ({rows}x{cols})")
+                print(f"    Area: {cluster.area:.0f} px² ({cluster.area/analysis.page_area*100:.1f}% of page)")
 
 
-# Backward compatibility - keep old class name as alias
-DocumentLayoutAnalyzer = ImprovedDocumentLayoutAnalyzer
-
+# Alias for backward compatibility
+DocumentLayoutAnalyzer = ImprovedAnalyzer
 
 if __name__ == "__main__":
     # Initialize analyzer
