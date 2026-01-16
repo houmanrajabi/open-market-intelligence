@@ -17,9 +17,7 @@ from src.processing.extractors.qwen_extractor import (
 
 # Surya Imports
 from surya.layout import LayoutPredictor
-from surya.model.detection.model import load_model as load_det_model
-from surya.model.recognition.model import load_model as load_rec_model
-from surya.model.recognition.processor import load_processor as load_rec_processor
+from surya.foundation import FoundationPredictor  #
 
 logger = logging.getLogger(__name__)
 
@@ -36,8 +34,13 @@ class HybridSuryaExtractor:
         logger.info("🚀 Initializing HybridSuryaExtractor...")
         
         # Load Surya Models (Layer 1)
-        # Note: Using default processor settings
-        self.layout_predictor = LayoutPredictor()
+        # 1. Initialize Foundation Predictor (Shared Encoder)
+        # This prevents reloading the heavy encoder for different tasks
+        self.foundation_predictor = FoundationPredictor() #
+        
+        # 2. Initialize Layout Predictor with the foundation
+        self.layout_predictor = LayoutPredictor(self.foundation_predictor) #
+        
         logger.info("✅ Surya Layout model loaded.")
 
     # --- LAYER 1: DETECTION ---
@@ -46,9 +49,10 @@ class HybridSuryaExtractor:
         Use Surya to detect layout elements with high precision.
         Returns normalized bboxes (0-1000 scale).
         """
+        # Surya expects a list of images
         layout_result = self.layout_predictor([image])[0]
         
-        # Convert Surya bboxes to normalized format [y0, x0, y1, x1] -> [ymin, xmin, ymax, xmax] 0-1000
+        # Convert Surya bboxes to normalized format [ymin, xmin, ymax, xmax] 0-1000
         width, height = image.size
         normalized_elements = []
 
@@ -68,7 +72,7 @@ class HybridSuryaExtractor:
                 "type": self._map_surya_label(label),
                 "bbox": norm_bbox,
                 "confidence": getattr(item, 'confidence', 1.0),
-                "original_bbox": bbox # Keep raw pixels for cropping
+                "original_bbox": bbox # Keep raw pixels for cropping if needed
             })
             
         return normalized_elements
@@ -172,7 +176,6 @@ class HybridSuryaExtractor:
         sorted_elements = sorted(elements, key=lambda x: (x["bbox"][0], x["bbox"][1]))
         
         current_header = "Document Start"
-        hierarchy_stack = [] # For nested H1 > H2 tracking (simple version: flat latest header)
 
         for elem in sorted_elements:
             if elem["type"] == "HEADER":
@@ -316,8 +319,6 @@ class HybridSuryaExtractor:
         """Helper to call existing Qwen interface with raw prompt."""
         content = call_vlm_with_retry(image_path, prompt)
         
-        # Here we reuse the parsing logic implicitly or return raw
-        # Ideally we'd reuse qwen_extractor.validate_csv etc., but for now:
         return {
             "type": type_label,
             "content": content,

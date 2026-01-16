@@ -1,355 +1,313 @@
-"""
-Main PDF Processor (v2.0)
-
-Orchestrates the Tier 1 Hybrid Extraction pipeline (Surya + PyMuPDF + Qwen VLM)
-and Semantic Chunking for RAG ingestion.
-"""
-
-import json
-import time
+import os
+import io
+import requests
+import fitz  # PyMuPDF
+from PIL import Image
+from typing import List, Dict, Any, Tuple
 import logging
-from pathlib import Path
-from typing import List, Dict, Any, Optional
-from datetime import datetime
 
 # Internal imports
-import fitz  # PyMuPDF for metadata
-from src.processing.extractors.hybrid_extractor_surya import extract_hybrid_content_surya
-from src.processing.chunker import DocumentChunker
-from src.utils.logger import logger
-from src.utils.models import DocumentMetadata
 from src.utils.config import config
+from src.processing.extractors.qwen_extractor import (
+    call_vlm_with_retry, 
+    TABLE_PROMPT, 
+    CHART_PROMPT
+)
 
-class PDFProcessor:
+logger = logging.getLogger(__name__)
+
+class HybridSuryaExtractor:
     """
-    Production PDF processor integrating Hybrid Surya Extraction and Semantic Chunking.
+    Tier 1 Hybrid Extractor (CLIENT VERSION).
     
-    Workflow:
-    1.  **Extract Content**: Delegate to HybridSuryaExtractor (Layers 1-4).
-        - Detection (Surya) -> Clustering -> Hierarchy -> Content Enrichment (VLM/PyMuPDF).
-    2.  **Chunk Content**: Use DocumentChunker to group elements by section and semantic context.
-    3.  **Save Output**: Persist structured JSONs (RAG chunks + full lineage).
+    Instead of running Surya locally, this client sends page images to the 
+    Vast.ai instance via the SSH tunnel (localhost:8002).
     """
 
-    def __init__(
-        self,
-        chunk_size: Optional[int] = None,
-        chunk_overlap: Optional[int] = None,
-        output_dir: Optional[Path] = None,
-        strategy: Optional[str] = None,
-        # Override parameters
-        preserve_large_tables: Optional[bool] = None,
-        small_table_threshold: Optional[int] = None,
-        multimodal_chunks: Optional[bool] = None,
-        similarity_threshold: Optional[float] = None
-    ):
+    def __init__(self):
+        logger.info("🚀 Initializing HybridSuryaExtractor (Remote Client)...")
+        # We no longer load models here. We just check the API config.
+        self.api_url = config.processing.surya_api_url  # Ensure this is set in your .env
+        if not self.api_url:
+            # Fallback if config is missing, assuming standard tunnel
+            self.api_url = "http://localhost:8002/v1/ocr" 
+            logger.warning(f"⚠️ SURYA_API_URL not found in config. Defaulting to {self.api_url}")
+
+    # --- LAYER 1: DETECTION (REMOTE) ---
+    def detect_layout(self, image: Image.Image) -> List[Dict[str, Any]]:
         """
-        Initialize the processor with configuration.
+        Send image to Remote API for layout detection.
         """
-        # Load settings from config with override capability
-        self.chunk_size = chunk_size or config.processing.chunk_size
-        self.chunk_overlap = chunk_overlap or config.processing.chunk_overlap
-        self.output_dir = output_dir or config.data.processed_data_dir
-        self.strategy = strategy or config.processing.strategy
-        
-        # Ensure output directory exists
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Initialize the semantic chunker
-        self.chunker = DocumentChunker(
-            chunk_size=self.chunk_size,
-            chunk_overlap=self.chunk_overlap,
-            min_chunk_size=config.processing.min_chunk_size,
-            max_chunk_size=config.processing.max_chunk_size,
-            strategy=self.strategy,
-            quality_threshold=config.processing.quality_threshold,
-            preserve_large_tables=preserve_large_tables if preserve_large_tables is not None 
-                                 else config.processing.preserve_large_tables,
-            small_table_threshold=small_table_threshold or config.processing.small_table_threshold,
-            multimodal_chunks=multimodal_chunks if multimodal_chunks is not None 
-                            else config.processing.multimodal_chunks,
-            similarity_threshold=similarity_threshold or config.processing.similarity_threshold
-        )
-        
-        logger.info(f"📄 PDFProcessor initialized (Hybrid Surya + {self.strategy} Chunking)")
-        logger.info(f"   Output dir: {self.output_dir}")
-        logger.info(f"   Chunk size: {self.chunk_size} | Overlap: {self.chunk_overlap}")
-
-    def process_document(
-        self,
-        pdf_path: Path,
-        doc_metadata: Optional[DocumentMetadata] = None
-    ) -> Dict[str, Any]:
-        """
-        Process a single PDF document through the Tier 1 pipeline.
-
-        Args:
-            pdf_path: Path to the input PDF file.
-            doc_metadata: Optional external metadata.
-
-        Returns:
-            Dictionary containing stats, extracted elements, and final chunks.
-        """
-        start_time = time.time()
-        doc_id = pdf_path.stem
-        logger.info(f"🚀 Starting processing for: {pdf_path.name} (ID: {doc_id})")
-
-        # 1. Setup Output Directory
-        doc_output_dir = self.output_dir / doc_id
-        doc_output_dir.mkdir(parents=True, exist_ok=True)
-
-        # 2. Extract Document-Level Metadata
-        base_metadata = self._extract_pdf_metadata(pdf_path)
-        if doc_metadata:
-            base_metadata.update(doc_metadata.to_dict())
-
-        # 3. Hybrid Extraction (Surya + VLM)
-        # Delegates the entire page loop, detection, and enrichment to the optimized extractor
         try:
-            logger.info("⚡ invoking HybridSuryaExtractor...")
-            # Note: The extractor handles its own temp files internally
-            all_elements = extract_hybrid_content_surya(str(pdf_path))
+            # 1. Convert PIL Image to Bytes
+            img_byte_arr = io.BytesIO()
+            image.save(img_byte_arr, format='JPEG')
+            img_byte_arr.seek(0)
+
+            # 2. Call the Remote API (Vast.ai Instance 2)
+            # Assuming your surya_api.py expects a file upload named 'file'
+            response = requests.post(
+            self.api_url,
+            files={'file': ('page.jpg', img_byte_arr, 'image/jpeg')},
+            data={'langs': '["en"]'},  # <--- Add this line!
+            timeout=600
+            )
             
-            if not all_elements:
-                logger.warning(f"⚠️  No elements extracted from {doc_id}")
-                return {}
-                
+            if response.status_code != 200:
+                logger.error(f"❌ Remote Surya API Error: {response.text}")
+                return []
+
+            # 3. Parse Response
+            # The API should return the normalized bboxes directly
+            layout_result = response.json()
+            return layout_result.get("elements", [])
+
         except Exception as e:
-            logger.error(f"❌ Extraction failed for {doc_id}: {e}", exc_info=True)
-            return {}
-
-        # 4. Semantic Chunking
-        # Groups the extracted elements based on the hierarchy built in Layer 3 of the extractor
-        logger.info(f"🧩 Chunking {len(all_elements)} extracted elements...")
-        chunks = self.chunker.chunk_elements(all_elements, doc_id=doc_id)
-
-        # 5. Compile Statistics
-        # Calculate total pages for stats (re-open briefly as extraction is decoupled)
-        try:
-            with fitz.open(pdf_path) as doc:
-                total_pages = doc.page_count
-        except:
-            total_pages = 0
-
-        stats = self._compile_stats(
-            start_time=start_time,
-            total_pages=total_pages,
-            num_elements=len(all_elements),
-            num_chunks=len(chunks),
-            chunker_stats=self.chunker.stats
-        )
-        
-        logger.info(
-            f"✅ Completed {doc_id}: {len(chunks)} chunks created in {stats['processing_time_seconds']}s. "
-            f"(Tables preserved: {stats.get('tables_preserved', 0)})"
-        )
-
-        # 6. Construct Final Output Structure
-        result = {
-            "doc_id": doc_id,
-            "metadata": base_metadata,
-            "stats": stats,
-            "chunks": chunks,
-            "elements": all_elements 
-        }
-
-        # 7. Save to Disk
-        self.save_processed_document(result, doc_id)
-        
-        return result
-
-    def _extract_pdf_metadata(self, pdf_path: Path) -> Dict[str, Any]:
-        """Extract basic technical metadata from PDF using PyMuPDF."""
-        try:
-            with fitz.open(pdf_path) as doc:
-                meta = doc.metadata
-                page_count = doc.page_count
-            
-            return {
-                "title": meta.get("title", pdf_path.stem),
-                "author": meta.get("author", ""),
-                "subject": meta.get("subject", ""),
-                "creation_date": meta.get("creationDate", ""),
-                "file_size_bytes": pdf_path.stat().st_size,
-                "file_size_mb": round(pdf_path.stat().st_size / (1024 * 1024), 2),
-                "page_count": page_count,
-                "processed_date": datetime.now().isoformat(),
-                "source_file": str(pdf_path.name)
-            }
-        except Exception as e:
-            logger.warning(f"Could not extract PDF metadata: {e}")
-            return {
-                "processed_date": datetime.now().isoformat(),
-                "source_file": str(pdf_path.name)
-            }
-
-    def _compile_stats(
-        self,
-        start_time: float,
-        total_pages: int,
-        num_elements: int,
-        num_chunks: int,
-        chunker_stats: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """Compile comprehensive processing statistics."""
-        processing_time = time.time() - start_time
-        
-        return {
-            "processing_time_seconds": round(processing_time, 2),
-            "pages_per_second": round(total_pages / processing_time, 2) if processing_time > 0 else 0,
-            "total_pages": total_pages,
-            "total_elements": num_elements,
-            "total_chunks": num_chunks,
-            "elements_per_page": round(num_elements / total_pages, 2) if total_pages > 0 else 0,
-            "chunks_per_page": round(num_chunks / total_pages, 2) if total_pages > 0 else 0,
-            "tables_preserved": chunker_stats.get("tables_preserved", 0),
-            "figures_processed": chunker_stats.get("figures_processed", 0),
-            "splits_performed": chunker_stats.get("splits_performed", 0),
-            "chunking_strategy": self.strategy
-        }
-
-    def save_processed_document(self, processed_data: Dict[str, Any], doc_id: str):
-        """Save the processed outputs (RAG chunks + lineage) to disk."""
-        output_dir = self.output_dir / doc_id
-        
-        # 1. Save RAG-ready chunks (Optimized for Vector DB ingestion)
-        chunks_data = [chunk.to_dict() for chunk in processed_data["chunks"]]
-        rag_output = {
-            "doc_id": doc_id,
-            "metadata": processed_data["metadata"],
-            "stats": processed_data["stats"],
-            "chunks": chunks_data,
-            "config": {
-                "chunk_size": self.chunk_size,
-                "chunk_overlap": self.chunk_overlap,
-                "strategy": self.strategy
-            }
-        }
-        
-        rag_chunks_path = output_dir / "rag_chunks.json"
-        with open(rag_chunks_path, 'w', encoding='utf-8') as f:
-            json.dump(rag_output, f, indent=2, ensure_ascii=False)
-        logger.debug(f"💾 Saved RAG chunks: {rag_chunks_path}")
-            
-        # 2. Save Full Lineage (For debugging/auditing)
-        full_structure_path = output_dir / "full_structure.json"
-        with open(full_structure_path, 'w', encoding='utf-8') as f:
-            json.dump({
-                "doc_id": doc_id,
-                "metadata": processed_data["metadata"],
-                "elements": processed_data["elements"]
-            }, f, indent=2, ensure_ascii=False)
-        logger.debug(f"💾 Saved full structure: {full_structure_path}")
-
-    def process_all_documents(
-        self,
-        pdf_dir: Path,
-        metadata: Optional[Dict[str, DocumentMetadata]] = None,
-        skip_existing: bool = True
-    ) -> List[Dict[str, Any]]:
-        """
-        Batch process all PDFs in a directory.
-        """
-        pdf_files = list(pdf_dir.glob("*.pdf"))
-        if not pdf_files:
-            logger.warning(f"⚠️  No PDF files found in {pdf_dir}")
+            logger.error(f"❌ Failed to connect to Surya API at {self.api_url}: {e}")
             return []
 
-        logger.info(f"📚 Processing batch of {len(pdf_files)} documents...")
-        results = []
-        skipped = 0
+    # --- LAYER 2: GEOMETRIC CLUSTERING (LOCAL) ---
+    # This logic is fast and mathematical, so we keep it on the Mac
+    def cluster_elements(self, elements: List[Dict[str, Any]], image_size: Tuple[int, int]) -> List[Dict[str, Any]]:
+        """
+        Associate captions with tables/figures and group conceptually.
+        """
+        clustered = []
+        used_indices = set()
+        
+        # Separate visual assets from text/captions
+        visuals = [(i, e) for i, e in enumerate(elements) if e["type"] in ["TABLE", "FIGURE"]]
+        texts = [(i, e) for i, e in enumerate(elements) if e["type"] in ["TEXT", "CAPTION"]]
 
-        for idx, pdf_path in enumerate(pdf_files, 1):
-            doc_id = pdf_path.stem
-            doc_meta = metadata.get(doc_id) if metadata else None
+        for v_idx, visual in visuals:
+            if v_idx in used_indices: continue
             
-            # Check skip logic
-            output_file = self.output_dir / doc_id / "rag_chunks.json"
-            if skip_existing and output_file.exists():
-                logger.info(f"⏭️  Skipping {doc_id} ({idx}/{len(pdf_files)}) - already processed")
-                skipped += 1
-                continue
+            # Search for nearest text/caption (Threshold: 5% of page height)
+            threshold_y = 50  
+            best_caption = None
+            best_dist = float('inf')
+            best_c_idx = -1
 
-            try:
-                logger.info(f"📄 Processing {doc_id} ({idx}/{len(pdf_files)})...")
-                result = self.process_document(pdf_path, doc_meta)
-                if result:
-                    results.append(result)
-            except Exception as e:
-                logger.error(f"❌ Failed to process {pdf_path.name}: {e}", exc_info=True)
-                continue
+            v_bbox = visual["bbox"] # [ymin, xmin, ymax, xmax]
 
-        logger.info(f"✅ Batch processing complete: {len(results)} processed, {skipped} skipped")
-        return results
+            for t_idx, text_elem in texts:
+                if t_idx in used_indices: continue
+                
+                t_bbox = text_elem["bbox"]
+                
+                # Horizontal alignment check
+                v_center_x = (v_bbox[1] + v_bbox[3]) / 2
+                t_center_x = (t_bbox[1] + t_bbox[3]) / 2
+                if abs(v_center_x - t_center_x) > 200: 
+                    continue
 
-    def get_processing_summary(self, results: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Generate summary statistics for a batch processing run."""
-        if not results:
-            return {"error": "No results to summarize"}
+                # Vertical proximity check
+                dist_below = t_bbox[0] - v_bbox[2]
+                dist_above = v_bbox[0] - t_bbox[2]
+                dist = min(d for d in [dist_below, dist_above] if d >= -10)
+                
+                if 0 <= dist < threshold_y:
+                    if dist < best_dist:
+                        best_dist = dist
+                        best_caption = text_elem
+                        best_c_idx = t_idx
+
+            if best_caption:
+                visual["detected_caption_bbox"] = best_caption["bbox"]
+                used_indices.add(best_c_idx)
+            
+            clustered.append(visual)
+            used_indices.add(v_idx)
+
+        # Add remaining elements
+        for i, e in enumerate(elements):
+            if i not in used_indices:
+                if e["type"] == "CAPTION": e["type"] = "TEXT"
+                clustered.append(e)
+
+        return clustered
+
+    # --- LAYER 3: HIERARCHY (LOCAL) ---
+    def build_hierarchy(self, elements: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Assign section context based on reading order."""
+        sorted_elements = sorted(elements, key=lambda x: (x["bbox"][0], x["bbox"][1]))
+        current_header = "Document Start"
+
+        for elem in sorted_elements:
+            if elem["type"] == "HEADER":
+                elem["is_header"] = True
+                elem["section_context"] = current_header
+            else:
+                elem["section_context"] = current_header
+                
+        return sorted_elements
+
+    # --- LAYER 4: ENRICHMENT (REMOTE QWEN + LOCAL PYMUPDF) ---
+    def extract_content(
+        self, 
+        elements: List[Dict[str, Any]], 
+        page_image: Image.Image, 
+        pdf_page: fitz.Page,
+        page_num: int
+    ) -> List[Dict[str, Any]]:
+        """
+        Execute extraction: PyMuPDF (Local) + Qwen VLM (Remote).
+        """
+        final_elements = []
+        w, h = page_image.size
+        pdf_w, pdf_h = pdf_page.rect.width, pdf_page.rect.height
         
-        total_pages = sum(r["stats"]["total_pages"] for r in results)
-        total_chunks = sum(r["stats"]["total_chunks"] for r in results)
-        total_elements = sum(r["stats"]["total_elements"] for r in results)
-        total_time = sum(r["stats"]["processing_time_seconds"] for r in results)
-        
+        current_section_text = "Document Start"
+
+        for idx, elem in enumerate(elements):
+            bbox_norm = elem["bbox"]
+            
+            # Map coordinates to PDF points
+            rect_pdf = fitz.Rect(
+                bbox_norm[1] * pdf_w / 1000,
+                bbox_norm[0] * pdf_h / 1000,
+                bbox_norm[3] * pdf_w / 1000,
+                bbox_norm[2] * pdf_h / 1000
+            )
+
+            # 1. TEXT / HEADER (Local is faster/better for simple text)
+            if elem["type"] in ["TEXT", "HEADER", "FOOTER"]:
+                text = pdf_page.get_text("text", clip=rect_pdf).strip()
+                
+                if elem["type"] == "HEADER" and len(text) > 3:
+                    current_section_text = text
+                
+                if not text: continue
+
+                final_elements.append({
+                    "id": f"p{page_num}_{idx}_{elem['type']}",
+                    "type": elem["type"],
+                    "content": text,
+                    "bbox_norm": bbox_norm,
+                    "page": page_num,
+                    "section_anchor": current_section_text,
+                    "metadata": {"extraction_method": "PyMuPDF_Surya"}
+                })
+
+            # 2. VISUALS (Send to Qwen VLM on Instance 1)
+            elif elem["type"] in ["TABLE", "FIGURE"]:
+                caption_text = ""
+                if "detected_caption_bbox" in elem:
+                    c_bbox = elem["detected_caption_bbox"]
+                    c_rect = fitz.Rect(
+                        c_bbox[1] * pdf_w / 1000,
+                        c_bbox[0] * pdf_h / 1000,
+                        c_bbox[3] * pdf_w / 1000,
+                        c_bbox[2] * pdf_h / 1000
+                    )
+                    caption_text = pdf_page.get_text("text", clip=c_rect).strip()
+                
+                # Crop logic
+                crop_box = (
+                    int(bbox_norm[1] * w / 1000),
+                    int(bbox_norm[0] * h / 1000),
+                    int(bbox_norm[3] * w / 1000),
+                    int(bbox_norm[2] * h / 1000)
+                )
+                crop_box = (
+                    max(0, crop_box[0]-10), max(0, crop_box[1]-10),
+                    min(w, crop_box[2]+10), min(h, crop_box[3]+10)
+                )
+                
+                crop_img = page_image.crop(crop_box)
+                crop_path = f"/tmp/crop_{page_num}_{idx}.jpg"
+                crop_img.save(crop_path)
+                
+                context_str = f"Context: This item appears in section '{current_section_text}'."
+                if caption_text:
+                    context_str += f" The caption is: '{caption_text}'."
+                
+                try:
+                    logger.info(f"🧠 Calling Qwen VLM (Remote) for {elem['type']}")
+                    
+                    if elem["type"] == "TABLE":
+                        prompt = f"{context_str}\n{TABLE_PROMPT}"
+                        vlm_result = self._extract_with_vlm(crop_path, prompt, "TABLE")
+                    else:
+                        prompt = f"{context_str}\n{CHART_PROMPT}"
+                        vlm_result = self._extract_with_vlm(crop_path, prompt, "FIGURE")
+                        
+                    vlm_result["metadata"]["caption"] = caption_text
+                    
+                    final_elements.append({
+                        "id": f"p{page_num}_{idx}_{elem['type']}",
+                        "page": page_num,
+                        "bbox_norm": bbox_norm,
+                        "section_anchor": current_section_text,
+                        **vlm_result
+                    })
+                    
+                except Exception as e:
+                    logger.error(f"VLM Failed: {e}")
+                finally:
+                    if os.path.exists(crop_path):
+                        os.remove(crop_path)
+
+        return final_elements
+
+    def _extract_with_vlm(self, image_path: str, prompt: str, type_label: str) -> Dict[str, Any]:
+        """Calls the Qwen VLM (which is already configured to use the remote API in qwen_extractor.py)"""
+        content = call_vlm_with_retry(image_path, prompt)
         return {
-            "documents_processed": len(results),
-            "total_pages": total_pages,
-            "total_chunks": total_chunks,
-            "total_elements": total_elements,
-            "total_processing_time_seconds": round(total_time, 2),
-            "avg_time_per_doc": round(total_time / len(results), 2),
-            "pages_per_second": round(total_pages / total_time, 2) if total_time > 0 else 0
+            "type": type_label,
+            "content": content,
+            "extraction_method": "Surya_Layout_Qwen_Content",
+            "metadata": {}
         }
 
-def main():
-    """CLI entry point."""
-    import argparse
+    # --- MAIN ENTRY POINT ---
+    def process_document(self, pdf_path: str, output_dir: str) -> List[Dict[str, Any]]:
+        """
+        Process entire PDF page by page.
+        """
+        doc = fitz.open(pdf_path)
+        all_elements = []
+        
+        for page_num, page in enumerate(doc):
+            try:
+                # Rasterize for API sending
+                pix = page.get_pixmap(dpi=config.processing.pdf_dpi)
+                img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                
+                # 1. Detection (NOW REMOTE via API)
+                layout_elements = self.detect_layout(img)
+                
+                if not layout_elements:
+                    logger.warning(f"No layout detected on page {page_num+1}")
+                    continue
 
-    parser = argparse.ArgumentParser(
-        description="Process FOMC PDFs with Hybrid Surya Pipeline",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter
-    )
-    parser.add_argument("--input-dir", type=Path, default=config.data.raw_data_dir, help="Input directory")
-    parser.add_argument("--output-dir", type=Path, default=config.data.processed_data_dir, help="Output directory")
-    parser.add_argument("--chunk-size", type=int, default=None, help="Chunk size (tokens)")
-    parser.add_argument("--chunk-overlap", type=int, default=None, help="Chunk overlap (tokens)")
-    parser.add_argument("--strategy", type=str, choices=["section_aware", "fixed_size"], default=None, help="Chunking strategy")
-    parser.add_argument("--no-skip", action="store_false", dest="skip_existing", help="Force reprocess all")
-    parser.add_argument("--metadata-file", type=Path, default=None, help="Path to metadata JSON")
+                # 2. Clustering (Local)
+                clustered = self.cluster_elements(layout_elements, img.size)
+                
+                # 3. Hierarchy (Local)
+                ordered = self.build_hierarchy(clustered)
+                
+                # 4. Extraction (Mixed Remote/Local)
+                page_content = self.extract_content(ordered, img, page, page_num + 1)
+                
+                all_elements.extend(page_content)
+                logger.info(f"✅ Page {page_num+1} processed: {len(page_content)} elements")
 
-    args = parser.parse_args()
-
-    # Load metadata
-    metadata = None
-    metadata_file = args.metadata_file or (args.input_dir / "metadata.json")
-    if metadata_file.exists():
-        try:
-            with open(metadata_file, 'r') as f:
-                data = json.load(f)
-                metadata = {k: DocumentMetadata.from_dict(v) for k, v in data.items()}
-        except Exception as e:
-            logger.warning(f"⚠️  Could not load metadata: {e}")
-
-    # Run Processor
-    processor = PDFProcessor(
-        chunk_size=args.chunk_size,
-        chunk_overlap=args.chunk_overlap,
-        output_dir=args.output_dir,
-        strategy=args.strategy
-    )
-
-    results = processor.process_all_documents(
-        args.input_dir, 
-        metadata,
-        skip_existing=args.skip_existing
-    )
+            except Exception as e:
+                logger.error(f"❌ Failed to process page {page_num+1}: {e}")
+        
+        return all_elements
     
-    if results:
-        summary = processor.get_processing_summary(results)
-        logger.info(f"\n{'='*60}\n📊 PROCESSING SUMMARY\n{'='*60}")
-        for k, v in summary.items():
-            logger.info(f"{k.replace('_', ' ').title()}: {v}")
 
 if __name__ == "__main__":
-    main()
+    print("🚀 Starting Document Processing...")
+    
+    # 1. Define your input
+    my_document_path = "data/raw/fomcprojtabl20200610.pdf" 
+    processed_data = HybridSuryaExtractor().process_document(my_document_path, output_dir="data/ts_processed/")
+
+    
+    # 3. Output the result
+    print(f"✅ Processing Complete. Found {len(processed_data)} chunks.")
+    print("--- Preview ---")
+    # print(processed_data[0])

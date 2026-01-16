@@ -61,36 +61,48 @@ class ProcessingSettings(BaseConfigSettings):
     min_chunk_size: int = Field(default=100, ge=50, le=500)
     max_chunk_size: int = Field(default=1024, ge=512, le=4096)
     strategy: Literal["section_aware", "fixed_size"] = "section_aware"
-    
+
     # Quality thresholds
     quality_threshold: float = Field(default=0.5, ge=0.0, le=1.0)
     similarity_threshold: float = Field(default=0.7, ge=0.0, le=1.0)
-    
+
     # Table handling
     preserve_large_tables: bool = True
     small_table_threshold: int = Field(default=150, ge=50, le=500)
     multimodal_chunks: bool = True
-    
+
     # Image processing
     pdf_dpi: int = Field(default=300, ge=150, le=600)
     image_max_size: int = Field(default=1600, ge=800, le=3200)
     image_quality: int = Field(default=95, ge=80, le=100)
     extract_figures: bool = True
-    
-    # VLM API settings
+
+    # VLM API settings (Qwen)
     vlm_api_url: str = Field(
-        default="https://sternmost-nonesuriently-trinity.ngrok-free.dev/v1"
+        default="http://localhost:8001/v1",
+        description="Qwen VLM API endpoint (VastAI via SSH tunnel or direct)"
     )
     vlm_model: str = "Qwen/Qwen2-VL-72B-Instruct-AWQ"
     vlm_api_key: str = Field(default="production-key")
     vlm_max_retries: int = Field(default=3, ge=1, le=10)
     vlm_temperature: float = Field(default=0.01, ge=0.0, le=1.0)
     vlm_max_tokens: int = Field(default=4096, ge=1024, le=8192)
-    
+
     # Parallel processing
     max_workers: int = Field(default=4, ge=1, le=16)
     enable_parallel: bool = False
-    
+
+    # Surya remote processing (optional)
+    surya_use_remote: bool = Field(
+        default=False,
+        description="Use remote Surya API instead of local models"
+    )
+    surya_api_url: str = Field(
+        default="http://localhost:8002",
+        description="Surya API endpoint (VastAI via SSH tunnel or direct)"
+    )
+    surya_api_key: str = Field(default="production-key")
+
     model_config = SettingsConfigDict(
         env_prefix="PROCESSING__",
         env_file=[".env", str(ENV_FILE_PATH)],
@@ -180,7 +192,7 @@ class LLMSettings(BaseConfigSettings):
     # Remote vLLM API settings
     api_base_url: str = Field(
         default="http://localhost:8000/v1",
-        description="Base URL for vLLM server (e.g., VastAI instance)"
+        description="Llama API endpoint (VastAI via SSH tunnel or direct)"
     )
     api_key: str = Field(
         default="EMPTY",
@@ -377,6 +389,82 @@ class EvaluationSettings(BaseConfigSettings):
         frozen=True
     )
 
+class VastAISettings(BaseConfigSettings):
+    """VastAI SSH Connection Configuration
+
+    This section documents SSH connection parameters for VastAI instances.
+    For manual SSH tunneling, use these values to establish connections.
+
+    Deployment Modes:
+    1. Local SSH Tunnels: Use localhost URLs (PROCESSING__VLM_API_URL=http://localhost:8001/v1)
+    2. Direct VastAI: Use instance IPs (PROCESSING__VLM_API_URL=http://<vastai-ip>:8001/v1)
+    3. Hybrid: Mix of tunneled and direct connections
+    """
+
+    # Deployment mode documentation
+    deployment_mode: Literal["local_tunnel", "direct_vastai", "hybrid"] = Field(
+        default="local_tunnel",
+        description="Deployment strategy: local_tunnel, direct_vastai, or hybrid"
+    )
+
+    # Qwen Model Instance
+    qwen_host: str = Field(
+        default="localhost",
+        description="VastAI host for Qwen (e.g., 'ssh.vast.ai' or IP address)"
+    )
+    qwen_ssh_port: int = Field(
+        default=22,
+        description="SSH port for Qwen instance"
+    )
+    qwen_api_port: int = Field(
+        default=8001,
+        description="API port where Qwen vLLM server runs"
+    )
+    qwen_ssh_user: str = Field(default="root")
+
+    # Llama Model Instance
+    llama_host: str = Field(
+        default="localhost",
+        description="VastAI host for Llama (e.g., 'ssh.vast.ai' or IP address)"
+    )
+    llama_ssh_port: int = Field(
+        default=22,
+        description="SSH port for Llama instance"
+    )
+    llama_api_port: int = Field(
+        default=8000,
+        description="API port where Llama vLLM server runs"
+    )
+    llama_ssh_user: str = Field(default="root")
+
+    # Surya Model Instance (Optional - for remote Surya processing)
+    surya_host: str = Field(
+        default="localhost",
+        description="VastAI host for Surya (optional, for remote layout detection)"
+    )
+    surya_ssh_port: int = Field(
+        default=22,
+        description="SSH port for Surya instance"
+    )
+    surya_api_port: int = Field(
+        default=8002,
+        description="API port where Surya API server runs"
+    )
+    surya_ssh_user: str = Field(default="root")
+
+    # SSH Authentication
+    ssh_key_path: Optional[Path] = Field(
+        default=None,
+        description="Path to SSH private key (e.g., ~/.ssh/vastai_rsa)"
+    )
+
+    model_config = SettingsConfigDict(
+        env_prefix="VASTAI__",
+        env_file=[".env", str(ENV_FILE_PATH)],
+        extra="ignore",
+        frozen=True
+    )
+
 class Config(BaseModel):
     """Main configuration object"""
     fomc_downloader: FOMCSettings = Field(default_factory=FOMCSettings)
@@ -390,6 +478,7 @@ class Config(BaseModel):
     retrieval: RetrievalSettings = Field(default_factory=RetrievalSettings)
     alignment: AlignmentSettings = Field(default_factory=AlignmentSettings)
     evaluation: EvaluationSettings = Field(default_factory=EvaluationSettings)
+    vastai: VastAISettings = Field(default_factory=VastAISettings)
 
     def validate_paths(self):
         """Create all necessary directories"""

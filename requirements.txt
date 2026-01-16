@@ -43,3 +43,5 @@ scipy  # For statistical computations
 # Utilities
 tqdm  # Progress bars
 python-dotenv  # Environment variable loading
+
+surya-ocr
