@@ -38,3 +38,7 @@ notebooks/surya_debug
 
 reports
 debug
+vllm_server.log
+
+pdf_images
+images
