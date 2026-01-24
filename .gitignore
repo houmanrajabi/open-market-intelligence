@@ -42,3 +42,5 @@ vllm_server.log
 
 pdf_images
 images
+
+data/
